@@ -1,6 +1,6 @@
 # Unsupervised Semantic Segmentation Benchmark Study
 
-Repo Structure: 
+### Repo Structure 
 
 | Folder | Files | Description |
 |--------|-------|-------------|
@@ -9,6 +9,10 @@ Repo Structure:
 |Processing/ | -- | Contains all scripts to process images |
 |Processing/ | GeoJSON_to_CSV.R | Converts QuPath GeoJSON annotations to CSV, with a cluster assigned to each pixel |
 
-File Access:
+### File Access
 
 Data can be pulled from PNNL's datahub: [Link] 
+
+### Citation 
+
+If any code or data is used, please cite [Link]
