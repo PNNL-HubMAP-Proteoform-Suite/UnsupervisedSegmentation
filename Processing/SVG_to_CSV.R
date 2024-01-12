@@ -73,11 +73,11 @@ SVG_to_CSV <- function(image_path,
 ## Make List of Features ## 
 Features <- data.frame(
   symbol = c("Islet", "Islet", "Smear", "Smear", "Glomerulus", "Glomerulus",
-             "Tubule", "Tubule", "Blood Vessel", "Blood Vessel", "Empty Space", "Empty Space"),
-  red = c(0, 180, 6, 128, 220, 244, 43, 191, 70, 199, 192, 230),
-  green = c(128, 217, 42, 164, 171, 230, 41, 190, 8, 180, 190, 235),
-  blue = c(0, 180, 155, 175, 222, 245, 120, 214, 27, 186, 62, 197),
-  thresh = c(30, 30, 20, 20, 10, 10, 30, 30, 30, 30, 15, 15)
+             "Tubule", "Tubule", "Blood.Vessel", "Blood.Vessel", "Empty.Space", "Empty.Space"),
+  red = c(0, 195, 234, 249, 183, 244, 43, 191, 70, 199, 192, 230),
+  green = c(126, 216, 51, 193, 171, 230, 41, 190, 8, 180, 190, 235),
+  blue = c(0, 188, 35, 189, 193, 245, 120, 214, 27, 186, 62, 197),
+  thresh = c(30, 30, 30, 30, 20, 20, 30, 30, 30, 30, 20, 20)
 )
 
 ## Pull SVGs ##
@@ -95,17 +95,22 @@ lapply(SVGs, function(SVG) {
   SimplePath <- SVG %>% strsplit("/") %>% unlist() %>% tail(1)
   message(SimplePath)
   
-  browser()
+  # Pull known features
+  Known <- Annotations[Annotations$Path == SimplePath, 2:7]
+  KnownFeatures <- colnames(Known)[Known != 0]
   
   # Run pipeline
-  Res <- SVG_to_CSV(SVG, Features)
+  Res <- SVG_to_CSV(SVG, Features %>% filter(symbol %in% KnownFeatures))
   
   # Make sure the number of clusters is correct
   if (length(unique(Res[[1]]$Cluster)) == Annotations[Annotations$Path == SimplePath, "Total.Feature.Classes"]) {
     NewPath <- gsub(".svg", ".csv", SimplePath, fixed = T)
     NewHeader <- SVGs[1] %>% strsplit("/") %>% unlist() %>% head(-1) %>% paste0(collapse = "/")
     NewPath <- file.path(NewHeader, NewPath)
-    fwrite(Res[[1]], NewPath)
+    CleanResults <- matrix(Res[[1]]$Cluster, nrow = max(Res[[1]]$Width), ncol = max(Res[[1]]$Length))
+    CleanResults[CleanResults == "Background"] <- NA
+    fwrite(CleanResults, NewPath)
+    ggsave(filename = gsub(".csv", "_extraction.png", NewPath), plot = Res[[2]])
   } else {
     browser()
   }
