@@ -47,10 +47,10 @@ ggplot(KMeans, aes(x = X, y = Y, fill = Cluster)) + geom_tile() + theme_bw()
 
 library(flexclust) # install.packages("flexclust")
 
-KCC <- kcca(Img_DF[,c("Red", "Green", "Blue")], k = 3)
+KCC <- kcca(Img_DF[,c("Red", "Green", "Blue")], k = 3, family = kccaFamily("angle"))
 KCentroid <- Img_DF %>% mutate(Cluster = as.factor(KCC@cluster))
 ggplot(KCentroid, aes(x = X, y = Y, fill = Cluster)) + geom_tile() + theme_void() +
-  scale_fill_manual(values = c("black", "#6D826D", "#703021"))
+  scale_fill_manual(values = c("#6D826D", "#703021", "black"))
 
 # t-SNE + KNN ------------------------------------------------------------------
 
