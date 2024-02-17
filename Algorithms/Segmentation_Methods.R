@@ -3,7 +3,7 @@ library(tidyverse)
 
 # Load a png
 library(png)
-testImg <- readPNG("~/Downloads/KPMP_uS-X002Y010.png")
+testImg <- readPNG("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney/Blur/KPMP_uS-X002Y010_blur.png")
 
 # Blur image
 library(spatstat)
@@ -23,9 +23,12 @@ convert_df <- function(the_mat, the_name) {
 }
 
 # Take red, green, and blue channels, and calculate the average pixel value
-Img_DF <- Reduce(left_join, list(convert_df(blur(im(testImg[,,1]), sigma = 8)$v, "Red"),
-                                 convert_df(blur(im(testImg[,,2]), sigma = 8)$v, "Green"),
-                                 convert_df(blur(im(testImg[,,3]), sigma = 8)$v, "Blue"))) 
+#Img_DF <- Reduce(left_join, list(convert_df(blur(im(testImg[,,1]), sigma = 8)$v, "Red"),
+#                                 convert_df(blur(im(testImg[,,2]), sigma = 8)$v, "Green"),
+#                                 convert_df(blur(im(testImg[,,3]), sigma = 8)$v, "Blue"))) 
+Img_DF <- Reduce(left_join, list(convert_df(testImg[,,1], "Red"),
+                                 convert_df(testImg[,,2], "Green"),
+                                 convert_df(testImg[,,3], "Blue"))) 
 Img_DF$X <- gsub("X", "", Img_DF$X) %>% as.numeric()
 Img_DF$Y <- gsub("Y", "", Img_DF$Y) %>% as.numeric()
 
@@ -46,7 +49,8 @@ library(flexclust) # install.packages("flexclust")
 
 KCC <- kcca(Img_DF[,c("Red", "Green", "Blue")], k = 3)
 KCentroid <- Img_DF %>% mutate(Cluster = as.factor(KCC@cluster))
-ggplot(KCentroid, aes(x = X, y = Y, fill = Cluster)) + geom_tile() + theme_bw()
+ggplot(KCentroid, aes(x = X, y = Y, fill = Cluster)) + geom_tile() + theme_void() +
+  scale_fill_manual(values = c("black", "#6D826D", "#703021"))
 
 # t-SNE + KNN ------------------------------------------------------------------
 
