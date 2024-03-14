@@ -6,8 +6,18 @@ blur <- function(in_path, out_path, radius = 100, sigma = 5) {
   image_write(blurred, out_path)
 }
 
-blur(
-  in_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney/Original/KPMP_uS-X002Y010.png",
-  out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney/Blur/KPMP_uS-X002Y010_blur.png",
-  sigma = 10
-)
+# Blur all the images 
+library(tidyverse)
+
+blur_df <- data.frame(PreBlur = list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney/Original", full.names = T)) %>%
+  mutate(PostBlur = gsub("Original", "Blur", PreBlur) %>% gsub(pattern = ".png", replacement = "_blur10.png", ., fixed = T))
+
+run <- lapply(1:nrow(blur_df), function(x) {
+  blur(
+    in_path = blur_df$PreBlur[x],
+    out_path = blur_df$PostBlur[x],
+    sigma = 10
+  )
+})
+
+
