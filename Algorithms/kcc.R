@@ -2,7 +2,7 @@
 #' @param out_path_data Path to place the segmented image data.frame
 #' @param out_path_image Path to place the segmented image 
 #' @param k Number of clusters 
-kcc_blur10 <- function(in_path, out_path_data, out_path_image, k) {
+apply_kcc <- function(in_path, out_path_data, out_path_image, k) {
   
   # Image processing libraries
   library(flexclust)
@@ -13,18 +13,9 @@ kcc_blur10 <- function(in_path, out_path_data, out_path_image, k) {
   library(tidyverse)
   library(data.table)
   
-  # Create unique ID
-  library(uuid)
-  id <- UUIDgenerate()
-  
-  # Blur the image 
+  # Read image
   img <- image_read(in_path)
-  blurred <- image_blur(img, radius = 100, sigma = 10)
-  path <- tempdir()
-  image_write(blurred, file.path(path, id), format = "png")
-  
-  # Read image 
-  imgRead <- readPNG(file.path(path, id))
+  imgRead <- readPNG(in_path)
   
   # Run a function for converting the data.frame 
   convert_df <- function(the_mat, the_name) {
@@ -46,7 +37,7 @@ kcc_blur10 <- function(in_path, out_path_data, out_path_image, k) {
   Img_DF$Y <- gsub("Y", "", Img_DF$Y) %>% as.numeric()
   
   # Run clustering 
-  KCC <- kcca(Img_DF[,c("Red", "Green", "Blue")], k = k, family = "angle")
+  KCC <- kcca(Img_DF[,c("Red", "Green", "Blue")], k = k)
   KCentroid <- Img_DF %>% mutate(Cluster = as.factor(KCC@cluster))
   
   # Save plot 

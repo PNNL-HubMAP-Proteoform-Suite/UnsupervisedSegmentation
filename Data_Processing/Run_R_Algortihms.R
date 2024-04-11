@@ -8,6 +8,70 @@ images <- data.frame(
   K = rep(3:5, each = 9)
 ) 
 
+#############
+## K-MEANS ##
+#############
+
+# Source function
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/kmeans.R")
+
+# Add outputs 
+images <- images %>%
+  mutate(
+    KM_Out = map2_chr(Original, K, function(x, y) {
+      gsub(pattern = "Scaled_Down", replacement = "KMeans", x = x) %>%
+        gsub(pattern = ".png|.jpg|.tif", replacement = paste0("_KMeans_", y, ".png"))
+    }), 
+    KM_Out_Data = map2_chr(Original, K, function(x, y) {
+      gsub(pattern = "Scaled_Down", replacement = "KMeans", x = x) %>%
+        gsub(pattern = ".png|.jpg|.tif", replacement = paste0("_KMeans_", y, ".txt"))
+    })
+  ) 
+
+cl <- makeCluster(8)
+registerDoParallel(cl)
+foreach(x = 1:nrow(images)) %dopar% {
+  apply_kmeans(
+    in_path = images$Original[x],
+    out_path_data = images$KM_Out_Data[x],
+    out_path_image = images$KM_Out[x],
+    k = images$K[x]
+  )
+}
+stopCluster(cl)
+
+#########
+## KCC ##
+#########
+
+# Source function
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/kcc.R")
+
+# Add outputs 
+images <- images %>%
+  mutate(
+    KC_Out = map2_chr(Original, K, function(x, y) {
+      gsub(pattern = "Scaled_Down", replacement = "KCC", x = x) %>%
+        gsub(pattern = ".png|.jpg|.tif", replacement = paste0("_KCC_", y, ".png"))
+    }), 
+    KC_Out_Data = map2_chr(Original, K, function(x, y) {
+      gsub(pattern = "Scaled_Down", replacement = "KCC", x = x) %>%
+        gsub(pattern = ".png|.jpg|.tif", replacement = paste0("_KCC_", y, ".txt"))
+    })
+  ) 
+
+cl <- makeCluster(8)
+registerDoParallel(cl)
+foreach(x = 2:nrow(images)) %dopar% {
+  apply_kcc(
+    in_path = images$Original[x],
+    out_path_data = images$KC_Out_Data[x],
+    out_path_image = images$KC_Out[x],
+    k = images$K[x]
+  )
+}
+stopCluster(cl)
+
 ##################
 ## KCC + Blur10 ##
 ##################
@@ -27,9 +91,6 @@ images <- images %>%
         gsub(pattern = ".png|.jpg|.tif", replacement = paste0("_KCCBlur10_", y, ".txt"))
     })
   ) 
-
-images <- images %>% filter(grepl("VU-kidney|RCC-BF-Fused", KCC_Out))
-
 
 cl <- makeCluster(8)
 registerDoParallel(cl)
