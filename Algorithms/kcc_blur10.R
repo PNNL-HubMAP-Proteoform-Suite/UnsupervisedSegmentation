@@ -2,7 +2,7 @@
 #' @param out_path_data Path to place the segmented image data.frame
 #' @param out_path_image Path to place the segmented image 
 #' @param k Number of clusters 
-kcc_blur10_angle <- function(in_path, out_path_data, out_path_image, k) {
+kcc_blur10 <- function(in_path, out_path_data, out_path_image, k) {
   
   # Image processing libraries
   library(flexclust)
@@ -13,14 +13,18 @@ kcc_blur10_angle <- function(in_path, out_path_data, out_path_image, k) {
   library(tidyverse)
   library(data.table)
   
+  # Create unique ID
+  library(uuid)
+  id <- UUIDgenerate()
+  
   # Blur the image 
   img <- image_read(in_path)
   blurred <- image_blur(img, radius = 100, sigma = 10)
   path <- tempdir()
-  image_write(blurred, file.path(path, "image.jpg"))
+  image_write(blurred, file.path(path, id), format = "png")
   
   # Read image 
-  imgRead <- readPNG(file.path(path, "image.jpg"))
+  imgRead <- readPNG(file.path(path, id))
   
   # Run a function for converting the data.frame 
   convert_df <- function(the_mat, the_name) {
@@ -54,11 +58,7 @@ kcc_blur10_angle <- function(in_path, out_path_data, out_path_image, k) {
   fwrite(KCentroid %>% 
            dplyr::select(X, Y, Cluster) %>%
            pivot_wider(values_from = Cluster, id_cols = X, names_from = Y), out_path_data, quote = F, row.names = F, sep = "\t")
-  dim <- magick::image_attributes(img)[9, "value"] %>%
-    strsplit(",") %>%
-    unlist() %>%
-    as.numeric()
-  ggsave(out_path_image, clusPlot, units = "px", width = dim[1], height = dim[2])
+  ggsave(out_path_image, clusPlot, units = "px", width = image_info(img)$width, height = image_info(img)$height)
   
 }
 

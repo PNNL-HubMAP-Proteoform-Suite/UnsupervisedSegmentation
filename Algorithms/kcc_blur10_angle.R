@@ -17,10 +17,10 @@ kcc_blur10_angle <- function(in_path, out_path_data, out_path_image, k) {
   img <- image_read(in_path)
   blurred <- image_blur(img, radius = 100, sigma = 10)
   path <- tempdir()
-  image_write(blurred, file.path(path, "image.jpg"))
+  image_write(blurred, file.path(path, paste0(id, ".jpg")))
   
   # Read image 
-  imgRead <- readPNG(file.path(path, "image.jpg"))
+  imgRead <- readPNG(file.path(path, paste0(id, ".jpg")))
   
   # Run a function for converting the data.frame 
   convert_df <- function(the_mat, the_name) {

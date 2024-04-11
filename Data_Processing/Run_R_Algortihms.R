@@ -1,33 +1,41 @@
+library(tidyverse)
 library(doParallel)
 library(foreach)
 
+# Start an image data.frame
+images <- data.frame(
+  Original = rep(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/NewCohort/Original_Image", full.names = T), 3),
+  K = rep(3:5, each = 9)
+) 
 
+##################
+## KCC + Blur10 ##
+##################
 
+# Source function
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/kcc_blur10.R")
 
-
-# Process blur images 
-blur_df <- data.frame(PostBlur = list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney/Blur", full.names = T)) %>%
+# Add outputs 
+images <- images %>%
   mutate(
-    Mask = gsub("Blur/", "KCC_Blur_Angle/Mask/", PostBlur) %>% gsub(pattern = ".png", replacement = "_KCC_angle.txt", ., fixed = T),
-    ResultImage = gsub("Blur/", "KCC_Blur_Angle/Image/", PostBlur) %>% gsub(pattern = ".png", replacement = "_KCC_angle.png", ., fixed = T),
-    Clusters = Metadata$`Total Feature Classes`
+    KCC_Out = map2_chr(Original, K, function(x, y) {
+      gsub(pattern = "Original_Image", replacement = "KCC_Blur10", x = x) %>%
+        gsub(pattern = ".png|.jpg|.tif", replacement = paste0("_KCCBlur10_", y, ".png"))
+    }), 
+    KCC_Out_Data = map2_chr(Original, K, function(x, y) {
+      gsub(pattern = "Original_Image", replacement = "KCC_Blur10", x = x) %>%
+        gsub(pattern = ".png|.jpg|.tif", replacement = paste0("_KCCBlur10_", y, ".txt"))
+    })
   )
 
-
-cl <- makeCluster(8)
-registerDoParallel(cl)
-
-foreach(x = 17:nrow(blur_df)) %dopar% { 
-  
-  kcc(
-    in_path = blur_df$PostBlur[x],
-    out_path_data = blur_df$Mask[x],
-    out_path_image = blur_df$ResultImage[x],
-    k = blur_df$Clusters[x],
-    family = kccaFamily("angle")
+cl <- makeCluster(8); registerDoParallel(cl)
+foreach(x = 1:nrow(images)) %dopar% { 
+  kcc_blur10(
+    in_path = images$Original[x],
+    out_path_data = images$KCC_Out_Data[x],
+    out_path_image = images$KCC_Out[x],
+    k = images$K[x]
   )
-  
 }
-
 stopCluster(cl)
 
