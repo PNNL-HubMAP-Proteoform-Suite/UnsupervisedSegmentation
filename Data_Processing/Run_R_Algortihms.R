@@ -62,7 +62,7 @@ images <- images %>%
 
 cl <- makeCluster(8)
 registerDoParallel(cl)
-foreach(x = 2:nrow(images)) %dopar% {
+foreach(x = 1:nrow(images)) %dopar% {
   apply_kcc(
     in_path = images$Original[x],
     out_path_data = images$KC_Out_Data[x],
@@ -104,5 +104,36 @@ foreach(x = 1:nrow(images)) %dopar% {
 }
 stopCluster(cl)
 
+#################
+## T-SNE + KCC ##
+#################
+
+# Source function
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/tsne_kcc.R")
+
+# Add outputs 
+images <- images %>%
+  mutate(
+    TSNE_Out = map2_chr(Original, K, function(x, y) {
+      gsub(pattern = "Scaled_Down", replacement = "TSNE_KCC", x = x) %>%
+        gsub(pattern = ".png|.jpg|.tif", replacement = paste0("_TSNE-KCC_", y, ".png"))
+    }), 
+    TSNE_Out_Data = map2_chr(Original, K, function(x, y) {
+      gsub(pattern = "Scaled_Down", replacement = "TSNE_KCC", x = x) %>%
+        gsub(pattern = ".png|.jpg|.tif", replacement = paste0("_TSNE-KCC_", y, ".txt"))
+    })
+  ) 
+
+cl <- makeCluster(8)
+registerDoParallel(cl)
+foreach(x = 1:nrow(images)) %dopar% {
+  tsne_kcc(
+    in_path = images$Original[x],
+    out_path_data = images$TSNE_Out_Data[x],
+    out_path_image = images$TSNE_Out[x],
+    k = images$K[x]
+  )
+}
+stopCluster(cl)
 
 
