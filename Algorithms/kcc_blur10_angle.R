@@ -1,28 +1,26 @@
-library(doParallel)
-library(foreach)
-
-library(magick)
-
-blur <- function(in_path, out_path, radius = 100, sigma = 10) {
-  img <- image_read(in_path)
-  blurred <- image_blur(img, radius = radius, sigma = sigma)
-  image_write(blurred, out_path)
-}
-
-# Blur all the images 
-library(tidyverse)
-
-
-kcc <- function(in_path, out_path_data, out_path_image, k, family) {
+#' @param in_path Path to the input image 
+#' @param out_path_data Path to place the segmented image data.frame
+#' @param out_path_image Path to place the segmented image 
+#' @param k Number of clusters 
+kcc_blur10_angle <- function(in_path, out_path_data, out_path_image, k) {
   
-  library(flexclust) 
+  # Image processing libraries
+  library(flexclust)
+  library(magick)
   library(png)
   
+  # Data processing libraries 
   library(tidyverse)
   library(data.table)
   
-  # Read all layers of an image 
-  imgRead <- png::readPNG(in_path)
+  # Blur the image 
+  img <- image_read(in_path)
+  blurred <- image_blur(img, radius = 100, sigma = 10)
+  path <- tempdir()
+  image_write(blurred, file.path(path, "image.jpg"))
+  
+  # Read image 
+  imgRead <- readPNG(file.path(path, "image.jpg"))
   
   # Run a function for converting the data.frame 
   convert_df <- function(the_mat, the_name) {
@@ -44,20 +42,25 @@ kcc <- function(in_path, out_path_data, out_path_image, k, family) {
   Img_DF$Y <- gsub("Y", "", Img_DF$Y) %>% as.numeric()
   
   # Run clustering 
-  KCC <- kcca(Img_DF[,c("Red", "Green", "Blue")], k = k, family = family)
+  KCC <- kcca(Img_DF[,c("Red", "Green", "Blue")], k = k, family = "angle")
   KCentroid <- Img_DF %>% mutate(Cluster = as.factor(KCC@cluster))
   
   # Save plot 
-  clusPlot <- ggplot(KCentroid, aes(x = X, y = Y, fill = Cluster)) + geom_tile() + theme_void()
+  clusPlot <- ggplot(KCentroid, aes(x = X, y = Y, fill = Cluster)) + geom_raster(interpolate = TRUE) + 
+    theme_void() +
+    scale_fill_brewer(palette = "Spectral") + theme(legend.position = "none")
   
   # Write results
-  fwrite(KCentroid %>% dplyr::select(X, Y, Cluster), out_path_data, quote = F, row.names = F, sep = "\t")
-  ggsave(out_path_image, clusPlot)
+  fwrite(KCentroid %>% 
+           dplyr::select(X, Y, Cluster) %>%
+           pivot_wider(values_from = Cluster, id_cols = X, names_from = Y), out_path_data, quote = F, row.names = F, sep = "\t")
+  dim <- magick::image_attributes(img)[9, "value"] %>%
+    strsplit(",") %>%
+    unlist() %>%
+    as.numeric()
+  ggsave(out_path_image, clusPlot, units = "px", width = dim[1], height = dim[2])
   
 }
-
-# Get a number of clusters 
-Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv")
 
 
 
