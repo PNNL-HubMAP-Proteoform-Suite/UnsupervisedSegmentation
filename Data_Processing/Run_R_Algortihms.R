@@ -4,7 +4,7 @@ library(foreach)
 
 # Start an image data.frame
 images <- data.frame(
-  Original = rep(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/NewCohort/Original_Image", full.names = T), 3),
+  Original = rep(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/NewCohort/Scaled_Down/", full.names = T), 3),
   K = rep(3:5, each = 9)
 ) 
 
@@ -19,17 +19,21 @@ source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/kcc_blur10.R")
 images <- images %>%
   mutate(
     KCC_Out = map2_chr(Original, K, function(x, y) {
-      gsub(pattern = "Original_Image", replacement = "KCC_Blur10", x = x) %>%
+      gsub(pattern = "Scaled_Down", replacement = "KCC_Blur10", x = x) %>%
         gsub(pattern = ".png|.jpg|.tif", replacement = paste0("_KCCBlur10_", y, ".png"))
     }), 
     KCC_Out_Data = map2_chr(Original, K, function(x, y) {
-      gsub(pattern = "Original_Image", replacement = "KCC_Blur10", x = x) %>%
+      gsub(pattern = "Scaled_Down", replacement = "KCC_Blur10", x = x) %>%
         gsub(pattern = ".png|.jpg|.tif", replacement = paste0("_KCCBlur10_", y, ".txt"))
     })
-  )
+  ) 
 
-cl <- makeCluster(8); registerDoParallel(cl)
-foreach(x = 1:nrow(images)) %dopar% { 
+images <- images %>% filter(grepl("VU-kidney|RCC-BF-Fused", KCC_Out))
+
+
+cl <- makeCluster(8)
+registerDoParallel(cl)
+foreach(x = 1:nrow(images)) %dopar% {
   kcc_blur10(
     in_path = images$Original[x],
     out_path_data = images$KCC_Out_Data[x],
@@ -38,4 +42,6 @@ foreach(x = 1:nrow(images)) %dopar% {
   )
 }
 stopCluster(cl)
+
+
 
