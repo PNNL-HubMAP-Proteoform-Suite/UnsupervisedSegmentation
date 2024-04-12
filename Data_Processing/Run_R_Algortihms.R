@@ -136,4 +136,35 @@ foreach(x = 1:nrow(images)) %dopar% {
 }
 stopCluster(cl)
 
+###############
+## PCA + KCC ##
+###############
+
+# Source function
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/pca_kcc.R")
+
+# Add outputs 
+images <- images %>%
+  mutate(
+    PCA_Out = map2_chr(Original, K, function(x, y) {
+      gsub(pattern = "Scaled_Down", replacement = "PCA_KCC", x = x) %>%
+        gsub(pattern = ".png|.jpg|.tif", replacement = paste0("_PCA-KCC_", y, ".png"))
+    }), 
+    PCA_Out_Data = map2_chr(Original, K, function(x, y) {
+      gsub(pattern = "Scaled_Down", replacement = "PCA_KCC", x = x) %>%
+        gsub(pattern = ".png|.jpg|.tif", replacement = paste0("_PCA-KCC_", y, ".txt"))
+    })
+  ) 
+
+cl <- makeCluster(8)
+registerDoParallel(cl)
+foreach(x = 1:nrow(images)) %dopar% {
+  pca_kcc(
+    in_path = images$Original[x],
+    out_path_data = images$PCA_Out_Data[x],
+    out_path_image = images$PCA_Out[x],
+    k = images$K[x]
+  )
+}
+stopCluster(cl)
 

@@ -2,7 +2,7 @@
 #' @param out_path_data Path to place the segmented image data.frame
 #' @param out_path_image Path to place the segmented image 
 #' @param k Number of clusters 
-tsne_kcc <- function(in_path, out_path_data, out_path_image, k) {
+pca_kcc <- function(in_path, out_path_data, out_path_image, k) {
   
   # Image processing libraries
   library(flexclust)
