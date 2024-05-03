@@ -81,11 +81,11 @@ format_mask <- function(ProcessedImage) {
 
 ## Make List of Features ## 
 Features <- data.frame(
-  symbol = c("Green", "Green", "Pink", "Pink", "Purple", "Purple", "Red", "Red", "Yellow", "Yellow"),
-  red = c(55, 195, 220, 244, 70, 199, 234, 249, 208, 236),
-  green = c(126, 216, 171, 230, 8, 180, 51, 193, 207, 235),
-  blue = c(34, 188, 22, 245, 27, 186, 35, 189, 111, 197),
-  thresh = c(30, 30, 10, 10, 30, 30, 30, 30, 20, 20)
+  symbol = c("Green", "Green", "Pink", "Pink", "Purple", "Purple", "Red", "Red", "Yellow", "Yellow", "Purple", "Gray", "Gray", "Blue", "Blue", "Red2", "Red2"),
+  red = c(55, 195, 220, 244, 70, 199, 234, 249, 208, 236, 159, 128, 209, 57, 183, 219, 195),
+  green = c(126, 216, 171, 230, 8, 180, 51, 193, 207, 235, 128, 128, 209, 48, 180, 84, 154),
+  blue = c(34, 188, 22, 245, 27, 186, 35, 189, 111, 197, 137, 128, 209, 138, 212, 70, 135),
+  thresh = c(30, 30, 10, 10, 20, 20, 30, 30, 20, 20, 30, 10, 10, 10, 10, 30, 30)
 )
 
 ## Pull SVGs ##
@@ -120,11 +120,157 @@ write.table(format_mask(Mask3), "~/Git_Repos/UnsupervisedSegmentation/Images/Kid
 # Tile 4------------------------------------------------------------------------
 Mask4 <- SVG_to_CSV("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_SVG/KPMP_uS-X001Y009_Annotations.svg", 
                     Features %>% filter(symbol %in% c("Green", "Pink", "Red", "Yellow", "Purple")))
-Img4 <- make_plot(Mask4, c("white", "green", "pink", "purple" "red", "yellow"))
-ggsave("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_PNG/KPMP_uS-X001Y008_Annotations.png", plot = Img3,
-       units = "px", height = max(Mask3$Height), width = max(Mask3$Width))
-write.table(format_mask(Mask3), "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/KPMP_uS-X001Y008_Annotations.txt",
+Img4 <- make_plot(Mask4, c("white", "green", "pink", "purple", "red", "yellow"))
+ggsave("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_PNG/KPMP_uS-X001Y009_Annotations.png", plot = Img4,
+       units = "px", height = max(Mask4$Height), width = max(Mask4$Width))
+write.table(format_mask(Mask4), "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/KPMP_uS-X001Y009_Annotations.txt",
             quote = F, row.names = F, sep = "\t")
+
+# Tile 5------------------------------------------------------------------------
+Mask5 <- SVG_to_CSV("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_SVG/KPMP_uS-X001Y010_Annotations.svg", 
+                    Features %>% filter(symbol %in% c("Green", "Pink", "Purple", "Yellow")))
+Img5 <- make_plot(Mask5, c("white", "green", "pink", "purple", "yellow"))
+ggsave("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_PNG/KPMP_uS-X001Y010_Annotations.png", plot = Img5,
+       units = "px", height = max(Mask5$Height), width = max(Mask5$Width))
+write.table(format_mask(Mask5), "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/KPMP_uS-X001Y010_Annotations.txt",
+            quote = F, row.names = F, sep = "\t")
+
+# Tile 6------------------------------------------------------------------------
+Mask6 <- SVG_to_CSV("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_SVG/KPMP_uS-X002Y005_Annotations.svg", 
+                    Features %>% filter(symbol %in% c("Green", "Pink", "Yellow")))
+Img6 <- make_plot(Mask6, c("white", "green", "pink", "yellow"))
+ggsave("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_PNG/KPMP_uS-X002Y005_Annotations.png", plot = Img6,
+       units = "px", height = max(Mask6$Height), width = max(Mask6$Width))
+write.table(format_mask(Mask6), "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/KPMP_uS-X002Y005_Annotations.txt",
+            quote = F, row.names = F, sep = "\t")
+
+# Tile 7------------------------------------------------------------------------
+Mask7 <- SVG_to_CSV("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_SVG/KPMP_uS-X002Y006_Annotations.svg", 
+                    Features %>% filter(symbol %in% c("Green", "Pink", "Yellow", "Purple")))
+Img7 <- make_plot(Mask7, c("white", "green", "pink", "purple", "yellow"))
+ggsave("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_PNG/KPMP_uS-X002Y006_Annotations.png", plot = Img7,
+       units = "px", height = max(Mask7$Height), width = max(Mask7$Width))
+write.table(format_mask(Mask7), "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/KPMP_uS-X002Y006_Annotations.txt",
+            quote = F, row.names = F, sep = "\t")
+
+# Tile 8------------------------------------------------------------------------
+Mask8 <- SVG_to_CSV("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_SVG/KPMP_uS-X002Y007_Annotations.svg", 
+                    Features %>% filter(symbol %in% c("Green", "Pink", "Purple")))
+Img8 <- make_plot(Mask8, c("white", "green", "pink", "purple"))
+ggsave("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_PNG/KPMP_uS-X002Y007_Annotations.png", plot = Img8,
+       units = "px", height = max(Mask8$Height), width = max(Mask8$Width))
+write.table(format_mask(Mask8), "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/KPMP_uS-X002Y007_Annotations.txt",
+            quote = F, row.names = F, sep = "\t")
+
+# Tile 9------------------------------------------------------------------------
+Mask9 <- SVG_to_CSV("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_SVG/KPMP_uS-X002Y008_Annotations.svg", 
+                    Features %>% filter(symbol %in% c("Gray", "Purple")))
+Img9 <- make_plot(Mask9, c("white", "gray", "purple"))
+ggsave("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_PNG/KPMP_uS-X002Y008_Annotations.png", plot = Img9,
+       units = "px", height = max(Mask9$Height), width = max(Mask9$Width))
+write.table(format_mask(Mask9), "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/KPMP_uS-X002Y008_Annotations.txt",
+            quote = F, row.names = F, sep = "\t")
+
+# Tile 10------------------------------------------------------------------------
+Mask10 <- SVG_to_CSV("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_SVG/KPMP_uS-X002Y009_Annotations.svg", 
+                    Features %>% filter(symbol %in% c("Green")))
+Img10 <- make_plot(Mask10, c("white", "green"))
+ggsave("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_PNG/KPMP_uS-X002Y009_Annotations.png", plot = Img10,
+       units = "px", height = max(Mask10$Height), width = max(Mask10$Width))
+write.table(format_mask(Mask10), "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/KPMP_uS-X002Y009_Annotations.txt",
+            quote = F, row.names = F, sep = "\t")
+
+# Tile 11------------------------------------------------------------------------
+Mask11 <- SVG_to_CSV("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_SVG/KPMP_uS-X002Y010_Annotations.svg", 
+                     Features %>% filter(symbol %in% c("Green", "Red2")))
+Img11 <- make_plot(Mask11, c("white", "green", "red"))
+ggsave("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_PNG/KPMP_uS-X002Y010_Annotations.png", plot = Img11,
+       units = "px", height = max(Mask11$Height), width = max(Mask11$Width))
+write.table(format_mask(Mask11), "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/KPMP_uS-X002Y010_Annotations.txt",
+            quote = F, row.names = F, sep = "\t")
+
+# Tile 12------------------------------------------------------------------------
+Mask12 <- SVG_to_CSV("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_SVG/KPMP_uS-X002Y011_Annotations.svg", 
+                     Features %>% filter(symbol %in% c("Green")))
+Img12 <- make_plot(Mask12, c("white", "green"))
+ggsave("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_PNG/KPMP_uS-X002Y011_Annotations.png", plot = Img12,
+       units = "px", height = max(Mask12$Height), width = max(Mask12$Width))
+write.table(format_mask(Mask12), "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/KPMP_uS-X002Y011_Annotations.txt",
+            quote = F, row.names = F, sep = "\t")
+
+# Tile 13------------------------------------------------------------------------
+Mask13 <- SVG_to_CSV("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_SVG/KPMP_uS-X002Y012_Annotations.svg", 
+                     Features %>% filter(symbol %in% c("Green", "Pink")))
+Img13 <- make_plot(Mask13, c("white", "green", "pink"))
+ggsave("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_PNG/KPMP_uS-X002Y012_Annotations.png", plot = Img13,
+       units = "px", height = max(Mask13$Height), width = max(Mask13$Width))
+write.table(format_mask(Mask13), "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/KPMP_uS-X002Y012_Annotations.txt",
+            quote = F, row.names = F, sep = "\t")
+
+# Tile 14------------------------------------------------------------------------
+Mask14 <- SVG_to_CSV("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_SVG/KPMP_uS-X002Y013_Annotations.svg", 
+                     Features %>% filter(symbol %in% c("Green", "Purple")))
+Img14 <- make_plot(Mask14, c("white", "green", "purple"))
+ggsave("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_PNG/KPMP_uS-X002Y013_Annotations.png", plot = Img14,
+       units = "px", height = max(Mask14$Height), width = max(Mask14$Width))
+write.table(format_mask(Mask14), "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/KPMP_uS-X002Y013_Annotations.txt",
+            quote = F, row.names = F, sep = "\t")
+
+# Tile 15------------------------------------------------------------------------
+Mask15 <- SVG_to_CSV("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_SVG/KPMP_uS-X002Y014_Annotations.svg", 
+                     Features %>% filter(symbol %in% c("Green", "Purple", "Pink", "Blue")))
+Img15 <- make_plot(Mask15, c("white", "blue", "green", "pink", "purple"))
+ggsave("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_PNG/KPMP_uS-X002Y014_Annotations.png", plot = Img15,
+       units = "px", height = max(Mask15$Height), width = max(Mask15$Width))
+write.table(format_mask(Mask15), "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/KPMP_uS-X002Y014_Annotations.txt",
+            quote = F, row.names = F, sep = "\t")
+
+# Tile 16------------------------------------------------------------------------
+Mask16 <- SVG_to_CSV("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_SVG/KPMP_uS-X002Y015_Annotations.svg", 
+                     Features %>% filter(symbol %in% c("Green", "Purple", "Pink", "Blue")))
+Img16 <- make_plot(Mask16, c("white", "blue", "green", "pink", "purple"))
+ggsave("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_PNG/KPMP_uS-X002Y015_Annotations.png", plot = Img16,
+       units = "px", height = max(Mask16$Height), width = max(Mask16$Width))
+write.table(format_mask(Mask16), "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/KPMP_uS-X002Y015_Annotations.txt",
+            quote = F, row.names = F, sep = "\t")
+
+# Tile 17------------------------------------------------------------------------
+Mask17 <- SVG_to_CSV("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_SVG/KPMP_uS-X002Y016_Annotations.svg", 
+                     Features %>% filter(symbol %in% c("Green", "Purple", "Pink", "Blue")))
+Img17 <- make_plot(Mask17, c("white", "blue", "green", "pink", "purple"))
+ggsave("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_PNG/KPMP_uS-X002Y016_Annotations.png", plot = Img17,
+       units = "px", height = max(Mask17$Height), width = max(Mask17$Width))
+write.table(format_mask(Mask17), "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/KPMP_uS-X002Y016_Annotations.txt",
+            quote = F, row.names = F, sep = "\t")
+
+# Tile 18------------------------------------------------------------------------
+Mask18 <- SVG_to_CSV("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_SVG/KPMP_uS-X002Y017_Annotations.svg", 
+                     Features %>% filter(symbol %in% c("Green", "Purple", "Pink", "Blue")))
+Img18 <- make_plot(Mask18, c("white", "blue", "green", "pink", "purple"))
+ggsave("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_PNG/KPMP_uS-X002Y017_Annotations.png", plot = Img18,
+       units = "px", height = max(Mask18$Height), width = max(Mask18$Width))
+write.table(format_mask(Mask18), "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/KPMP_uS-X002Y017_Annotations.txt",
+            quote = F, row.names = F, sep = "\t")
+
+# Tile 19------------------------------------------------------------------------
+Mask19 <- SVG_to_CSV("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_SVG/KPMP_uS-X002Y018_Annotations.svg", 
+                     Features %>% filter(symbol %in% c("Green", "Purple", "Blue")))
+Img19 <- make_plot(Mask19, c("white", "blue", "green", "purple"))
+ggsave("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_PNG/KPMP_uS-X002Y018_Annotations.png", plot = Img19,
+       units = "px", height = max(Mask19$Height), width = max(Mask19$Width))
+write.table(format_mask(Mask19), "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/KPMP_uS-X002Y018_Annotations.txt",
+            quote = F, row.names = F, sep = "\t")
+
+# Tile 20------------------------------------------------------------------------
+Mask20 <- SVG_to_CSV("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_SVG/KPMP_uS-X002Y019_Annotations.svg", 
+                     Features %>% filter(symbol %in% c("Yellow", "Purple", "Gray")))
+Img20 <- make_plot(Mask20, c("white", "gray", "purple", "yellow"))
+ggsave("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_PNG/KPMP_uS-X002Y019_Annotations.png", plot = Img20,
+       units = "px", height = max(Mask20$Height), width = max(Mask20$Width))
+write.table(format_mask(Mask20), "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/KPMP_uS-X002Y019_Annotations.txt",
+            quote = F, row.names = F, sep = "\t")
+
+
 
 
 
