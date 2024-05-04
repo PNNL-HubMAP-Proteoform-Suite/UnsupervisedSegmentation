@@ -2,7 +2,7 @@
 #' @param out_path_data Path to place the segmented image data.frame
 #' @param out_path_image Path to place the segmented image 
 #' @param k Number of clusters 
-apply_kmeans <- function(in_path, out_path_data, out_path_image, k) {
+apply_kmeans <- function(in_path, k, out_path) {
   
   # Image processing libraries
   library(png)
@@ -11,6 +11,8 @@ apply_kmeans <- function(in_path, out_path_data, out_path_image, k) {
   # Data processing libraries 
   library(tidyverse)
   library(data.table)
+  library(uuid)
+  id <- UUIDgenerate()
 
   # Blur the image 
   img <- image_read(in_path)
@@ -19,7 +21,7 @@ apply_kmeans <- function(in_path, out_path_data, out_path_image, k) {
   image_write(blurred, file.path(path, id), format = "png")
   
   # Read blurred image
-  imgRead <- readPNG(file.path(path, id))
+  imgRead <- readPNG(in_path)
   
   # Run a function for converting the data.frame 
   convert_df <- function(the_mat, the_name) {
@@ -41,9 +43,19 @@ apply_kmeans <- function(in_path, out_path_data, out_path_image, k) {
   Img_DF$Y <- gsub("Y", "", Img_DF$Y) %>% as.numeric()
   
   # Run clustering 
-  KMeans <- Img_DF %>% mutate(Cluster = as.factor(kmeans(Img_DF[,c("Red", "Green", "Blue")], centers = k)$cluster))
+  KMeans <- Img_DF %>% mutate(Cluster = as.factor(kmeans(Img_DF[,c("Red", "Green", "Blue")], centers = k)$cluster)) %>%
+    select(X, Y, Cluster) 
   
-  # Save results 
-  browser()
+  # Shrink size
+  Smaller <- KMeans %>%
+    mutate(X = factor(X, levels = 1:max(X))) %>%
+    pivot_wider(id_cols = Y, names_from = X, values_from = Cluster) %>%
+    arrange(Y) %>%
+    select(-Y)
+  colnames(Smaller) <- paste0("V", colnames(Smaller))
+  
+  # Write file
+  end_string <- strsplit(in_path, "/") %>% unlist() %>% tail(1) %>% gsub(pattern = ".png", replacement = "_KMeans.txt", fixed = T)
+  fwrite(Smaller, file.path(out_path, end_string), quote = F, row.names = F, sep = "\t")
   
 }

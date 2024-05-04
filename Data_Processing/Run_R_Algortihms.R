@@ -1,12 +1,21 @@
 library(tidyverse)
+library(data.table)
 library(doParallel)
 library(foreach)
 
-# Start an image data.frame
-images <- data.frame(
-  Original = rep(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/NewCohort/Scaled_Down/", full.names = T), 3),
-  K = rep(3:5, each = 9)
-) 
+# Read Metadata
+Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv")
+
+# Create image path information
+Image_Paths <- Image_Metadata %>%
+  select(Path, ManualClusterNumber) %>%
+  group_by(Path) %>%
+  summarize(ClusterNum = n()) %>%
+  ungroup() %>%
+  mutate(
+    Path = paste0("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Original/", Path, ".png"),
+    Path = gsub("_Annotations", "", Path)
+  )
 
 #############
 ## K-MEANS ##
@@ -15,30 +24,14 @@ images <- data.frame(
 # Source function
 source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/kmeans.R")
 
-# Add outputs 
-images <- images %>%
-  mutate(
-    KM_Out = map2_chr(Original, K, function(x, y) {
-      gsub(pattern = "Scaled_Down", replacement = "KMeans", x = x) %>%
-        gsub(pattern = ".png|.jpg|.tif", replacement = paste0("_KMeans_", y, ".png"))
-    }), 
-    KM_Out_Data = map2_chr(Original, K, function(x, y) {
-      gsub(pattern = "Scaled_Down", replacement = "KMeans", x = x) %>%
-        gsub(pattern = ".png|.jpg|.tif", replacement = paste0("_KMeans_", y, ".txt"))
-    })
-  ) 
-
-cl <- makeCluster(8)
-registerDoParallel(cl)
-foreach(x = 1:nrow(images)) %dopar% {
+lapply(1:nrow(Image_Paths), function(x) {
   apply_kmeans(
-    in_path = images$Original[x],
-    out_path_data = images$KM_Out_Data[x],
-    out_path_image = images$KM_Out[x],
-    k = images$K[x]
+    in_path = Image_Paths$Path[x],
+    k = Image_Paths$ClusterNum[x],
+    out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMeans_TXT/"
   )
-}
-stopCluster(cl)
+})
+
 
 #########
 ## KCC ##
