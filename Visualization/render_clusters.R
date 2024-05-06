@@ -24,8 +24,7 @@ render_cluster <- function(data, colors, order) {
 
 # Clusters need to be matched manually 
 Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv")
-
-tile <- 25
+tile <- 28
 root <- unique(Image_Metadata$Path)[tile]
 data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMeans_TXT", 
                         gsub(pattern = "Annotations", replacement = "KMeans.txt", root)))
@@ -33,6 +32,7 @@ plot <- render_cluster(data,
                        unlist(Image_Metadata[Image_Metadata$Path == root, Color]),
                        unlist(Image_Metadata[Image_Metadata$Path == root, KMeans]))
 plot
+
 ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMeans_PNG", 
                  gsub("_Annotations", "_KMeans.png", root)),  plot = plot,
        units = "px", height = nrow(data), width = ncol(data))
