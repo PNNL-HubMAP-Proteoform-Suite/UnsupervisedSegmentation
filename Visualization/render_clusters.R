@@ -24,7 +24,7 @@ render_cluster <- function(data, colors, order) {
 
 # Clusters need to be matched manually 
 Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv")
-tile <- 28
+tile <- 30
 root <- unique(Image_Metadata$Path)[tile]
 data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMeans_TXT", 
                         gsub(pattern = "Annotations", replacement = "KMeans.txt", root)))
