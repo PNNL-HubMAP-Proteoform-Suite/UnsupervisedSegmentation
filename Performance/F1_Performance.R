@@ -25,7 +25,7 @@ Stats_Table <- data %>%
   
 # Make plots--------------------------------------------------------------------
 
-rbind(
+PerformancePlot <- rbind(
   left_join(
     Stats_Table %>% filter(Cluster == 1) %>% select(Image, Method, F1),
     Stats_Table %>% group_by(Image, Method) %>% summarize(`Number of Clusters` = n())
@@ -44,6 +44,7 @@ rbind(
     theme(legend.position = "none", plot.title = element_text(hjust = 0.5)) +
     facet_grid(rows = vars(Method), cols = vars(Type))
 
+PerformancePlot
 
 
 

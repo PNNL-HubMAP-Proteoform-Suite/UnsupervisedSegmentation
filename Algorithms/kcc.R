@@ -2,7 +2,7 @@
 #' @param out_path_data Path to place the segmented image data.frame
 #' @param out_path_image Path to place the segmented image 
 #' @param k Number of clusters 
-apply_kcc <- function(in_path, out_path_data, out_path_image, k) {
+apply_kcc <- function(in_path, k, out_path) {
   
   # Image processing libraries
   library(flexclust)
@@ -13,9 +13,18 @@ apply_kcc <- function(in_path, out_path_data, out_path_image, k) {
   library(tidyverse)
   library(data.table)
   
-  # Read image
+  # Create unique ID
+  library(uuid)
+  id <- UUIDgenerate()
+  
+  # Blur the image 
   img <- image_read(in_path)
-  imgRead <- readPNG(in_path)
+  blurred <- image_blur(img, radius = 100, sigma = 10)
+  path <- tempdir()
+  image_write(blurred, file.path(path, id), format = "png")
+  
+  # Read image 
+  imgRead <- readPNG(file.path(path, id))
   
   # Run a function for converting the data.frame 
   convert_df <- function(the_mat, the_name) {
@@ -40,18 +49,18 @@ apply_kcc <- function(in_path, out_path_data, out_path_image, k) {
   KCC <- kcca(Img_DF[,c("Red", "Green", "Blue")], k = k)
   KCentroid <- Img_DF %>% mutate(Cluster = as.factor(KCC@cluster))
   
-  # Save plot 
-  clusPlot <- ggplot(KCentroid, aes(x = X, y = Y, fill = Cluster)) + geom_raster(interpolate = TRUE) + 
-    theme_void() +
-    scale_fill_brewer(palette = "Spectral") + theme(legend.position = "none")
+  # Shrink size
+  Smaller <- KCentroid %>%
+    mutate(X = factor(X, levels = 1:max(X))) %>%
+    pivot_wider(id_cols = Y, names_from = X, values_from = Cluster) %>%
+    arrange(Y) %>%
+    select(-Y)
+  colnames(Smaller) <- paste0("V", colnames(Smaller))
   
-  # Write results
-  fwrite(KCentroid %>% 
-           dplyr::select(X, Y, Cluster) %>%
-           pivot_wider(values_from = Cluster, id_cols = X, names_from = Y), out_path_data, quote = F, row.names = F, sep = "\t")
-  ggsave(out_path_image, clusPlot, units = "px", width = image_info(img)$width, height = image_info(img)$height)
+  # Write file
+  end_string <- strsplit(in_path, "/") %>% unlist() %>% tail(1) %>% gsub(pattern = ".png", replacement = "_KCC.txt", fixed = T)
+  fwrite(Smaller, file.path(out_path, end_string), quote = F, row.names = F, sep = "\t")
   
 }
-
 
 

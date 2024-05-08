@@ -40,59 +40,13 @@ lapply(1:nrow(Image_Paths), function(x) {
 # Source function
 source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/kcc.R")
 
-# Add outputs 
-images <- images %>%
-  mutate(
-    KC_Out = map2_chr(Original, K, function(x, y) {
-      gsub(pattern = "Scaled_Down", replacement = "KCC", x = x) %>%
-        gsub(pattern = ".png|.jpg|.tif", replacement = paste0("_KCC_", y, ".png"))
-    }), 
-    KC_Out_Data = map2_chr(Original, K, function(x, y) {
-      gsub(pattern = "Scaled_Down", replacement = "KCC", x = x) %>%
-        gsub(pattern = ".png|.jpg|.tif", replacement = paste0("_KCC_", y, ".txt"))
-    })
-  ) 
-
-cl <- makeCluster(8)
+cl <- makeCluster(6)
 registerDoParallel(cl)
-foreach(x = 1:nrow(images)) %dopar% {
+foreach(x = 1:nrow(Image_Paths)) %dopar% {
   apply_kcc(
-    in_path = images$Original[x],
-    out_path_data = images$KC_Out_Data[x],
-    out_path_image = images$KC_Out[x],
-    k = images$K[x]
-  )
-}
-stopCluster(cl)
-
-##################
-## KCC + Blur10 ##
-##################
-
-# Source function
-source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/kcc_blur10.R")
-
-# Add outputs 
-images <- images %>%
-  mutate(
-    KCC_Out = map2_chr(Original, K, function(x, y) {
-      gsub(pattern = "Scaled_Down", replacement = "KCC_Blur10", x = x) %>%
-        gsub(pattern = ".png|.jpg|.tif", replacement = paste0("_KCCBlur10_", y, ".png"))
-    }), 
-    KCC_Out_Data = map2_chr(Original, K, function(x, y) {
-      gsub(pattern = "Scaled_Down", replacement = "KCC_Blur10", x = x) %>%
-        gsub(pattern = ".png|.jpg|.tif", replacement = paste0("_KCCBlur10_", y, ".txt"))
-    })
-  ) 
-
-cl <- makeCluster(8)
-registerDoParallel(cl)
-foreach(x = 1:nrow(images)) %dopar% {
-  kcc_blur10(
-    in_path = images$Original[x],
-    out_path_data = images$KCC_Out_Data[x],
-    out_path_image = images$KCC_Out[x],
-    k = images$K[x]
+    in_path = Image_Paths$Path[x],
+    k = Image_Paths$ClusterNum[x],
+    out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KCC_TXT/"
   )
 }
 stopCluster(cl)
