@@ -9,11 +9,15 @@ library(data.table)
 KM_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/KMeans_Blur_Counts.csv")
 KM <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/KMeans_Counts.csv") %>% 
   filter(Image %in% KM_Blur$Image)
+KCC <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/KCC_Counts.csv")
+KCC_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/KCC_Blur_Counts.csv")
 
 # Calculate F1s
 rbind(
   KM %>% mutate(Algorithm = "K-Means", Format = "Original"),
-  KM_Blur %>% mutate(Algorithm = "K-Means", Format = "Blur")
+  KM_Blur %>% mutate(Algorithm = "K-Means", Format = "Blur"),
+  KCC %>% mutate(Algorithm = "KCC", Format = "Original"),
+  KCC_Blur %>% mutate(Algorithm = "KCC", Format = "Blur")
 ) %>%
   pivot_wider(id_cols = c(Cluster, Image, Algorithm, Format), names_from = Counts, values_from = Freq) %>%
   mutate(
@@ -25,10 +29,9 @@ rbind(
   mutate(Format = factor(Format, levels = c("Original", "Blur"))) %>%
   ggplot(aes(x = Algorithm, y = F1, fill = Format)) +
     geom_boxplot() + 
-    geom_jitter(width = 0.25, height = 0) +
     theme_bw() +
     ylim(c(0,1)) + 
-    ylab("")
+    xlab("")
 
 
 

@@ -106,9 +106,53 @@ KMeans_Blur_Counts <- do.call(rbind, lapply(c(3:5, 10, 12, 14, 16, 20, 22, 27), 
 
 fwrite(KMeans_Blur_Counts, "~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/KMeans_Blur_Counts.csv", quote = F, row.names = F)
 
+# KCC---------------------------------------------------------------------------
 
+# Non-Blurred
+KCC_Counts <- do.call(rbind, lapply(c(3:5, 10, 12, 14, 16, 20, 22, 27), function(tile) {
+  
+  # Get tile name 
+  tilename <- Metadata[Metadata$Tile == tile, "Path"] %>% head(1) %>% unlist()
+  
+  message(tilename)
+  
+  # Read data
+  truth_path <- file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT", 
+                          paste0(tilename, ".txt"))
+  truth <- fread(truth_path)
+  predicted_path <- file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KCC_TXT/", 
+                              paste0(gsub("_Annotations", "", tilename), "_KCC.txt"))
+  predicted <- fread(predicted_path)
+  
+  truth_counts(truth, predicted, tilename, "KCC")
+  
+  
+}))
 
+fwrite(KCC_Counts, "~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/KCC_Counts.csv", quote = F, row.names = F)
 
+# Blurred 
+KCC_Blur_Counts <- do.call(rbind, lapply(c(3:5, 10, 12, 14, 16, 20, 22, 27), function(tile) {
+  
+  # Get tile name 
+  tilename <- Metadata[Metadata$Tile == tile, "Path"] %>% head(1) %>% unlist()
+  
+  message(tilename)
+  
+  # Read data
+  truth_path <- file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT", 
+                          paste0(tilename, ".txt"))
+  truth <- fread(truth_path)
+  predicted_path <- file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KCC_Blur_TXT", 
+                              paste0(gsub("_Annotations", "", tilename), "_KCC.txt"))
+  predicted <- fread(predicted_path)
+  
+  truth_counts(truth, predicted, tilename, "KCC.Blur")
+  
+  
+}))
+
+fwrite(KCC_Blur_Counts, "~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/KCC_Blur_Counts.csv", quote = F, row.names = F)
 
 
 
