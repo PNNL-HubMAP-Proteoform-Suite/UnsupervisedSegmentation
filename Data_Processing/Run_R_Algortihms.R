@@ -17,6 +17,44 @@ Image_Paths <- Image_Metadata %>%
     Path = gsub("_Annotations", "", Path)
   )
 
+################################################################################
+### Blurring Study--------------------------------------------------------------
+################################################################################
+
+# Subset down to blur images
+targets <- Image_Metadata %>% filter(Blur == "X") %>% select(Path) %>% unique() %>% unlist() 
+BlurMeta <- Image_Metadata %>% filter(Path %in% targets)
+BlurPaths <- BlurMeta %>%
+  select(Path, ManualClusterNumber) %>%
+  group_by(Path) %>%
+  summarize(ClusterNum = n()) %>%
+  ungroup() %>%
+  mutate(
+    Path = paste0("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Original/", Path, ".png"),
+    Path = gsub("_Annotations", "", Path)
+  ) 
+
+#############
+## K-Means ##
+#############
+
+# Run unmodified and blurred images 
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/kmeans.R")
+
+lapply(1:nrow(BlurPaths), function(x) {
+  apply_kmeans(
+    in_path = BlurPaths$Path[x],
+    k = BlurPaths$ClusterNum[x],
+    out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMeans_Blur_TXT/",
+    blur = TRUE # Change to false when unblurred
+  )
+})
+
+
+################################################################################
+### Full study------------------------------------------------------------------
+################################################################################
+
 #############
 ## K-MEANS ##
 #############

@@ -20,7 +20,26 @@ render_cluster <- function(data, colors, order) {
   
 }
 
-## Clusters need to be matched manually. Matches are racked in the Annotation Summary csv
+## Clusters need to be matched manually. Matches are tracked in the Annotation Summary csv
+
+# KMeans Blur-------------------------------------------------------------------
+
+Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv") %>%
+  filter(Blur == "X")
+subtile <- 10
+root <- unique(Image_Metadata$Path)[subtile]
+data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMeans_Blur_TXT", 
+                        gsub(pattern = "Annotations", replacement = "KMeans.txt", root)))
+plot <- render_cluster(data,
+                       unlist(Image_Metadata[Image_Metadata$Path == root, Color]),
+                       unlist(Image_Metadata[Image_Metadata$Path == root, Kmeans.Blur]))
+plot
+
+ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMeans_Blur_PNG", 
+                 gsub("_Annotations", "_KMeans.png", root)),  plot = plot,
+       units = "px", height = nrow(data), width = ncol(data))
+
+
 
 # KMeans------------------------------------------------------------------------
 

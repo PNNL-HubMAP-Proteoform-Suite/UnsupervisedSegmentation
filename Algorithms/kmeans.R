@@ -1,8 +1,8 @@
 #' @param in_path Path to the input image 
-#' @param out_path_data Path to place the segmented image data.frame
-#' @param out_path_image Path to place the segmented image 
-#' @param k Number of clusters 
-apply_kmeans <- function(in_path, k, out_path) {
+#' @param k Number of clusters
+#' @param out_path Path to place the segmented image data.frame
+#' @param blur A boolean (TRUE/FALSE) to indicate whether the image should be blurred or not 
+apply_kmeans <- function(in_path, k, out_path, blur = TRUE) {
   
   # Image processing libraries
   library(png)
@@ -12,16 +12,26 @@ apply_kmeans <- function(in_path, k, out_path) {
   library(tidyverse)
   library(data.table)
   library(uuid)
-  id <- UUIDgenerate()
 
-  # Blur the image 
-  img <- image_read(in_path)
-  blurred <- image_blur(img, radius = 100, sigma = 10)
-  path <- tempdir()
-  image_write(blurred, file.path(path, id), format = "png")
-  
-  # Read blurred image
-  imgRead <- readPNG(in_path)
+  # If blur, make and read the blurred image 
+  if (blur) {
+    
+    # Generate unique name
+    id <- UUIDgenerate()
+    
+    # Blur the image
+    img <- image_read(in_path)
+    blurred <- image_blur(img, radius = 100, sigma = 10)
+    path <- tempdir()
+    image_write(blurred, file.path(path, id), format = "png")
+
+    # Read blurred image
+    imgRead <- readPNG(file.path(path, id))
+    
+  } else {
+    imgRead <- readPNG(in_path)
+  }
+
   
   # Run a function for converting the data.frame 
   convert_df <- function(the_mat, the_name) {
