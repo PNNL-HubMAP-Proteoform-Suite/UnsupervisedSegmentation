@@ -61,17 +61,17 @@ ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMean
 
 Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv") %>%
   filter(Blur == "X")
-subtile <- 1
+subtile <- 7
 root <- unique(Image_Metadata$Path)[subtile]
 data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KCC_TXT", 
-                        gsub(pattern = "Annotations", replacement = "KMeans.txt", root)))
+                        gsub(pattern = "Annotations", replacement = "KCC.txt", root)))
 plot <- render_cluster(data,
                        unlist(Image_Metadata[Image_Metadata$Path == root, Color]),
                        unlist(Image_Metadata[Image_Metadata$Path == root, KCC]))
 plot
 
 ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KCC_PNG", 
-                 gsub("_Annotations", "_KMeans.png", root)),  plot = plot,
+                 gsub("_Annotations", "_KCC.png", root)),  plot = plot,
        units = "px", height = nrow(data), width = ncol(data))
 
 
