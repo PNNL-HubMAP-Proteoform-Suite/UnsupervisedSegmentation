@@ -60,6 +60,7 @@ truth_counts <- function(truth, predicted, image, model) {
 
 # K-Means-----------------------------------------------------------------------
 
+# Non-Blurred
 KMeans_Counts <- do.call(rbind, lapply(1:30, function(tile) {
   
   # Get tile name 
@@ -82,8 +83,28 @@ KMeans_Counts <- do.call(rbind, lapply(1:30, function(tile) {
 
 fwrite(KMeans_Counts, "~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/KMeans_Counts.csv", quote = F, row.names = F)
 
+# Blurred 
+KMeans_Blur_Counts <- do.call(rbind, lapply(c(3:5, 10, 12, 14, 16, 20, 22, 27), function(tile) {
+  
+  # Get tile name 
+  tilename <- Metadata[Metadata$Tile == tile, "Path"] %>% head(1) %>% unlist()
+  
+  message(tilename)
+  
+  # Read data
+  truth_path <- file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT", 
+                          paste0(tilename, ".txt"))
+  truth <- fread(truth_path)
+  predicted_path <- file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMeans_Blur_TXT", 
+                              paste0(gsub("_Annotations", "", tilename), "_KMeans.txt"))
+  predicted <- fread(predicted_path)
+  
+  truth_counts(truth, predicted, tilename, "Kmeans.Blur")
+  
+  
+}))
 
-
+fwrite(KMeans_Blur_Counts, "~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/KMeans_Blur_Counts.csv", quote = F, row.names = F)
 
 
 
