@@ -39,8 +39,6 @@ ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMean
                  gsub("_Annotations", "_KMeans.png", root)),  plot = plot,
        units = "px", height = nrow(data), width = ncol(data))
 
-
-
 # KMeans------------------------------------------------------------------------
 
 Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv")
@@ -91,9 +89,22 @@ ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KCC_B
                  gsub("_Annotations", "_KCC.png", root)),  plot = plot,
        units = "px", height = nrow(data), width = ncol(data))
 
+# Clara-------------------------------------------------------------------------
 
+Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv") %>%
+  filter(Blur == "X")
+subtile <- 1
+root <- unique(Image_Metadata$Path)[subtile]
+data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Clara_TXT/", 
+                        gsub(pattern = "Annotations", replacement = "Clara.txt", root)))
+plot <- render_cluster(data,
+                       unlist(Image_Metadata[Image_Metadata$Path == root, Color]),
+                       unlist(Image_Metadata[Image_Metadata$Path == root, Clara]))
+plot
 
-
+ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Clara_PNG", 
+                 gsub("_Annotations", "_Clara.png", root)),  plot = plot,
+       units = "px", height = nrow(data), width = ncol(data))
 
 
 

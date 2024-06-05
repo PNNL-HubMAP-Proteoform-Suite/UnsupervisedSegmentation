@@ -66,6 +66,23 @@ lapply(1:nrow(BlurPaths), function(x) {
   )
 })
 
+###############
+## PCA + KCC ##
+###############
+
+# Run unmodified and blurred images 
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/clara.R")
+
+lapply(1:nrow(BlurPaths), function(x) {
+  apply_clara(
+    in_path = BlurPaths$Path[x],
+    k = BlurPaths$ClusterNum[x],
+    out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Clara_Blur_TXT/", 
+    blur = TRUE
+  )
+})
+
+
 ################################################################################
 ### Full study------------------------------------------------------------------
 ################################################################################
