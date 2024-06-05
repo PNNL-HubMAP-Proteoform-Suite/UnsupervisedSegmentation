@@ -45,11 +45,26 @@ lapply(1:nrow(BlurPaths), function(x) {
   apply_kmeans(
     in_path = BlurPaths$Path[x],
     k = BlurPaths$ClusterNum[x],
-    out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMeans_Blur_TXT/",
+    out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMeans_Blur_TXT/", # update when blurred
     blur = TRUE # Change to false when unblurred
   )
 })
 
+#########
+## KCC ##
+#########
+
+# Run unmodified and blurred images 
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/kcc.R")
+
+lapply(1:nrow(BlurPaths), function(x) {
+  apply_kcc(
+    in_path = BlurPaths$Path[x],
+    k = BlurPaths$ClusterNum[x],
+    out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KCC_Blur_TXT/", # update when blurred
+    blur = TRUE # Change to false when unblurred
+  )
+})
 
 ################################################################################
 ### Full study------------------------------------------------------------------

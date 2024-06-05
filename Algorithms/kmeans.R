@@ -2,7 +2,7 @@
 #' @param k Number of clusters
 #' @param out_path Path to place the segmented image data.frame
 #' @param blur A boolean (TRUE/FALSE) to indicate whether the image should be blurred or not 
-apply_kmeans <- function(in_path, k, out_path, blur = TRUE) {
+apply_kmeans <- function(in_path, k, out_path, blur) {
   
   # Image processing libraries
   library(png)
@@ -31,7 +31,6 @@ apply_kmeans <- function(in_path, k, out_path, blur = TRUE) {
   } else {
     imgRead <- readPNG(in_path)
   }
-
   
   # Run a function for converting the data.frame 
   convert_df <- function(the_mat, the_name) {

@@ -25,7 +25,10 @@ rbind(
   mutate(Format = factor(Format, levels = c("Original", "Blur"))) %>%
   ggplot(aes(x = Algorithm, y = F1, fill = Format)) +
     geom_boxplot() + 
-    theme_bw()
+    geom_jitter(width = 0.25, height = 0) +
+    theme_bw() +
+    ylim(c(0,1)) + 
+    ylab("")
 
 
 
