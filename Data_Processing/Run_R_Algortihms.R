@@ -93,12 +93,10 @@ lapply(1:nrow(BlurPaths), function(x) {
   apply_supercells(
     in_path = BlurPaths$Path[x],
     k = BlurPaths$ClusterNum[x],
-    out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Supercells_TXT/",
-    blur = FALSE
+    out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Supercells_Blur_TXT/",
+    blur = TRUE
   )
 })
-
-
 
 ################################################################################
 ### Full study------------------------------------------------------------------

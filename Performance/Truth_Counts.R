@@ -120,4 +120,12 @@ Clara_Blur_Counts <- calc_wrapper(c(3:5, 10, 12, 14, 16, 20, 22, 27), "Kidney_Ti
                                 "_Clara.txt", "Clara.Blur")
 fwrite(Clara_Blur_Counts, "~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/Clara_Blur_Counts.csv", quote = F, row.names = F)
 
+# Supercells--------------------------------------------------------------------
+
+# Non-Blurred
+Scells_Counts <- calc_wrapper(c(3:5, 10, 12, 14, 16, 20, 22, 27), "Kidney_Tiles/Supercells_TXT",
+                             "_supercells.txt", "Supercells")
+fwrite(Scells_Counts, "~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/Supercell_Counts.csv", quote = F, row.names = F)
+
+
 
