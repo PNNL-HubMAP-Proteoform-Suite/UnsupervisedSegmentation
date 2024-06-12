@@ -58,148 +58,66 @@ truth_counts <- function(truth, predicted, image, model) {
   
 }
 
+#' Wrapper function to calculate values 
+#' @param image_num An integer to represent what tiled images are wanted
+#' @param subfolder The folder with the text files
+#' @param tag Image tag name
+#' @param column_name Name of the colum in the metadata file with the cluster designations
+calc_wrapper <- function(image_num, subfolder, tag, column_name) {
+  
+  do.call(rbind, lapply(image_num, function(tile) {
+    
+    # Get tile name 
+    tilename <- Metadata[Metadata$Tile == tile, "Path"] %>% head(1) %>% unlist()
+    message(tilename)
+    
+    # Pull truth and predicted data 
+    truth_path <- file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT", 
+                            paste0(tilename, ".txt"))
+    truth <- fread(truth_path)
+    predicted_path <- file.path("~/Git_Repos/UnsupervisedSegmentation/Images", subfolder, 
+                                paste0(gsub("_Annotations", "", tilename), tag))
+    predicted <- fread(predicted_path)
+    truth_counts(truth, predicted, tilename, column_name)
+    
+  })) %>% return()
+  
+}
+
 # K-Means-----------------------------------------------------------------------
 
 # Non-Blurred
-KMeans_Counts <- do.call(rbind, lapply(1:30, function(tile) {
-  
-  # Get tile name 
-  tilename <- Metadata[Metadata$Tile == tile, "Path"] %>% head(1) %>% unlist()
-  
-  message(tilename)
-  
-  # Read data
-  truth_path <- file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT", 
-                          paste0(tilename, ".txt"))
-  truth <- fread(truth_path)
-  predicted_path <- file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMeans_TXT", 
-                              paste0(gsub("_Annotations", "", tilename), "_KMeans.txt"))
-  predicted <- fread(predicted_path)
-  
-  truth_counts(truth, predicted, tilename, "KMeans")
-  
-  
-}))
-
+KMeans_Counts <- calc_wrapper(c(3:5, 10, 12, 14, 16, 20, 22, 27), "Kidney_Tiles/KMeans_TXT",
+                              "_KMeans.txt", "Kmeans")
 fwrite(KMeans_Counts, "~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/KMeans_Counts.csv", quote = F, row.names = F)
 
 # Blurred 
-KMeans_Blur_Counts <- do.call(rbind, lapply(c(3:5, 10, 12, 14, 16, 20, 22, 27), function(tile) {
-  
-  # Get tile name 
-  tilename <- Metadata[Metadata$Tile == tile, "Path"] %>% head(1) %>% unlist()
-  
-  message(tilename)
-  
-  # Read data
-  truth_path <- file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT", 
-                          paste0(tilename, ".txt"))
-  truth <- fread(truth_path)
-  predicted_path <- file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMeans_Blur_TXT", 
-                              paste0(gsub("_Annotations", "", tilename), "_KMeans.txt"))
-  predicted <- fread(predicted_path)
-  
-  truth_counts(truth, predicted, tilename, "Kmeans.Blur")
-  
-  
-}))
-
+KMeans_Blur_Counts <- calc_wrapper(c(3:5, 10, 12, 14, 16, 20, 22, 27), "Kidney_Tiles/KMeans_Blur_TXT",
+                                   "_KMeans.txt", "Kmeans.Blur")
 fwrite(KMeans_Blur_Counts, "~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/KMeans_Blur_Counts.csv", quote = F, row.names = F)
 
 # KCC---------------------------------------------------------------------------
 
 # Non-Blurred
-KCC_Counts <- do.call(rbind, lapply(c(3:5, 10, 12, 14, 16, 20, 22, 27), function(tile) {
-  
-  # Get tile name 
-  tilename <- Metadata[Metadata$Tile == tile, "Path"] %>% head(1) %>% unlist()
-  
-  message(tilename)
-  
-  # Read data
-  truth_path <- file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT", 
-                          paste0(tilename, ".txt"))
-  truth <- fread(truth_path)
-  predicted_path <- file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KCC_TXT/", 
-                              paste0(gsub("_Annotations", "", tilename), "_KCC.txt"))
-  predicted <- fread(predicted_path)
-  
-  truth_counts(truth, predicted, tilename, "KCC")
-  
-  
-}))
-
+KCC_Counts <- calc_wrapper(c(3:5, 10, 12, 14, 16, 20, 22, 27), "Kidney_Tiles/KCC_TXT",
+                           "_KCC.txt", "KCC")
 fwrite(KCC_Counts, "~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/KCC_Counts.csv", quote = F, row.names = F)
 
 # Blurred 
-KCC_Blur_Counts <- do.call(rbind, lapply(c(3:5, 10, 12, 14, 16, 20, 22, 27), function(tile) {
-  
-  # Get tile name 
-  tilename <- Metadata[Metadata$Tile == tile, "Path"] %>% head(1) %>% unlist()
-  
-  message(tilename)
-  
-  # Read data
-  truth_path <- file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT", 
-                          paste0(tilename, ".txt"))
-  truth <- fread(truth_path)
-  predicted_path <- file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KCC_Blur_TXT", 
-                              paste0(gsub("_Annotations", "", tilename), "_KCC.txt"))
-  predicted <- fread(predicted_path)
-  
-  truth_counts(truth, predicted, tilename, "KCC.Blur")
-  
-  
-}))
-
+KCC_Blur_Counts <- calc_wrapper(c(3:5, 10, 12, 14, 16, 20, 22, 27), "Kidney_Tiles/KCC_Blur_TXT",
+                                "_KCC.txt", "KCC.Blur")
 fwrite(KCC_Blur_Counts, "~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/KCC_Blur_Counts.csv", quote = F, row.names = F)
 
 # Clara-------------------------------------------------------------------------
 
 # Non-Blurred
-Clara_Counts <- do.call(rbind, lapply(c(3:5, 10, 12, 14, 16, 20, 22, 27), function(tile) {
-  
-  # Get tile name 
-  tilename <- Metadata[Metadata$Tile == tile, "Path"] %>% head(1) %>% unlist()
-  
-  message(tilename)
-  
-  # Read data
-  truth_path <- file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT", 
-                          paste0(tilename, ".txt"))
-  truth <- fread(truth_path)
-  predicted_path <- file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Clara_TXT/", 
-                              paste0(gsub("_Annotations", "", tilename), "_Clara.txt"))
-  predicted <- fread(predicted_path)
-  
-  truth_counts(truth, predicted, tilename, "Clara")
-  
-  
-}))
-
+Clara_Counts <- calc_wrapper(c(3:5, 10, 12, 14, 16, 20, 22, 27), "Kidney_Tiles/Clara_TXT",
+                             "_Clara.txt", "Clara")
 fwrite(Clara_Counts, "~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/Clara_Counts.csv", quote = F, row.names = F)
 
 # Blurred 
-Clara_Blur_Counts <- do.call(rbind, lapply(c(3:5, 10, 12, 14, 16, 20, 22, 27), function(tile) {
-  
-  # Get tile name 
-  tilename <- Metadata[Metadata$Tile == tile, "Path"] %>% head(1) %>% unlist()
-  
-  message(tilename)
-  
-  # Read data
-  truth_path <- file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT", 
-                          paste0(tilename, ".txt"))
-  truth <- fread(truth_path)
-  predicted_path <- file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Clara_Blur_TXT", 
-                              paste0(gsub("_Annotations", "", tilename), "_Clara.txt"))
-  predicted <- fread(predicted_path)
-  
-  truth_counts(truth, predicted, tilename, "Clara.Blur")
-  
-  
-}))
-
+Clara_Blur_Counts <- calc_wrapper(c(3:5, 10, 12, 14, 16, 20, 22, 27), "Kidney_Tiles/Clara_Blur_TXT",
+                                "_Clara.txt", "Clara.Blur")
 fwrite(Clara_Blur_Counts, "~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/Clara_Blur_Counts.csv", quote = F, row.names = F)
 
 

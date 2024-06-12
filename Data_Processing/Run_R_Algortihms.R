@@ -70,6 +70,34 @@ lapply(1:nrow(BlurPaths), function(x) {
 ## CLARA ##
 ###########
 
+# Run unmodified and blurred images 
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/clara.R")
+
+lapply(1:nrow(BlurPaths), function(x) {
+  apply_clara(
+    in_path = BlurPaths$Path[x],
+    k = BlurPaths$ClusterNum[x],
+    out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Clara_Blur_TXT/", # update when blurred
+    blur = TRUE # Change to false when unblurred
+  )
+})
+
+################
+## SUPERCELLS ##
+################
+
+# Run unmodified and blurred images 
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/supercells.R")
+
+lapply(1:nrow(BlurPaths), function(x) {
+  apply_supercells(
+    in_path = BlurPaths$Path[x],
+    k = BlurPaths$ClusterNum[x],
+    out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Supercells_TXT/",
+    blur = FALSE
+  )
+})
+
 
 
 ################################################################################
