@@ -154,14 +154,52 @@ KCC_Blur_Counts <- do.call(rbind, lapply(c(3:5, 10, 12, 14, 16, 20, 22, 27), fun
 
 fwrite(KCC_Blur_Counts, "~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/KCC_Blur_Counts.csv", quote = F, row.names = F)
 
+# Clara-------------------------------------------------------------------------
 
+# Non-Blurred
+Clara_Counts <- do.call(rbind, lapply(c(3:5, 10, 12, 14, 16, 20, 22, 27), function(tile) {
+  
+  # Get tile name 
+  tilename <- Metadata[Metadata$Tile == tile, "Path"] %>% head(1) %>% unlist()
+  
+  message(tilename)
+  
+  # Read data
+  truth_path <- file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT", 
+                          paste0(tilename, ".txt"))
+  truth <- fread(truth_path)
+  predicted_path <- file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Clara_TXT/", 
+                              paste0(gsub("_Annotations", "", tilename), "_Clara.txt"))
+  predicted <- fread(predicted_path)
+  
+  truth_counts(truth, predicted, tilename, "Clara")
+  
+  
+}))
 
+fwrite(Clara_Counts, "~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/Clara_Counts.csv", quote = F, row.names = F)
 
+# Blurred 
+Clara_Blur_Counts <- do.call(rbind, lapply(c(3:5, 10, 12, 14, 16, 20, 22, 27), function(tile) {
+  
+  # Get tile name 
+  tilename <- Metadata[Metadata$Tile == tile, "Path"] %>% head(1) %>% unlist()
+  
+  message(tilename)
+  
+  # Read data
+  truth_path <- file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT", 
+                          paste0(tilename, ".txt"))
+  truth <- fread(truth_path)
+  predicted_path <- file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Clara_Blur_TXT", 
+                              paste0(gsub("_Annotations", "", tilename), "_Clara.txt"))
+  predicted <- fread(predicted_path)
+  
+  truth_counts(truth, predicted, tilename, "Clara.Blur")
+  
+  
+}))
 
-
-
-
-
-
+fwrite(Clara_Blur_Counts, "~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/Clara_Blur_Counts.csv", quote = F, row.names = F)
 
 

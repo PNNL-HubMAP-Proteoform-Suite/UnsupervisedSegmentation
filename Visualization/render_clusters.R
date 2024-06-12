@@ -93,7 +93,7 @@ ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KCC_B
 
 Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv") %>%
   filter(Blur == "X")
-subtile <- 2
+subtile <- 10
 root <- unique(Image_Metadata$Path)[subtile]
 data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Clara_Blur_TXT/", 
                         gsub(pattern = "Annotations", replacement = "Clara.txt", root)))
