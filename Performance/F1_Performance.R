@@ -14,6 +14,7 @@ KCC_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/KCC_B
 Clara <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/Clara_Counts.csv")
 Clara_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/Clara_Blur_Counts.csv")
 Scell <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/Supercell_Counts.csv")
+Scell_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/Supercell_Blur_Counts.csv")
 
 # Calculate F1s
 rbind(
@@ -23,7 +24,8 @@ rbind(
   KCC_Blur %>% mutate(Algorithm = "KCC", Format = "Blur"),
   Clara %>% mutate(Algorithm = "Clara", Format = "Original"),
   Clara_Blur %>% mutate(Algorithm = "Clara", Format = "Blur"),
-  Scell %>% mutate(Algorithm = "Supercells", Format = "Original")
+  Scell %>% mutate(Algorithm = "Supercells", Format = "Original"),
+  Scell_Blur %>% mutate(Algorithm = "Supercells", Format = "Blur")
 ) %>%
   pivot_wider(id_cols = c(Cluster, Image, Algorithm, Format), names_from = Counts, values_from = Freq) %>%
   mutate(

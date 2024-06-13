@@ -59,16 +59,16 @@ ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KCC_P
 
 Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv") %>%
   filter(Blur == "X")
-subtile <- 10
+subtile <- 1
 root <- unique(Image_Metadata$Path)[subtile]
-data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Clara_Blur_TXT/", 
+data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Clara_TXT/", 
                         gsub(pattern = "Annotations", replacement = "Clara.txt", root)))
 plot <- render_cluster(data,
                        unlist(Image_Metadata[Image_Metadata$Path == root, Color]),
                        unlist(Image_Metadata[Image_Metadata$Path == root, Clara.Blur]))
 plot
 
-ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Clara_Blur_PNG/", 
+ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Clara_PNG/", 
                  gsub("_Annotations", "_Clara.png", root)),  plot = plot,
        units = "px", height = nrow(data), width = ncol(data))
 
@@ -78,14 +78,14 @@ Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_An
   filter(Blur == "X")
 subtile <- 10
 root <- unique(Image_Metadata$Path)[subtile]
-data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Supercells_TXT/", 
+data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Supercells_Blur_TXT/", 
                         gsub(pattern = "Annotations", replacement = "supercells.txt", root)))
 plot <- render_cluster(data,
                        unlist(Image_Metadata[Image_Metadata$Path == root, Color]),
-                       unlist(Image_Metadata[Image_Metadata$Path == root, Supercells]))
+                       unlist(Image_Metadata[Image_Metadata$Path == root, Supercells.Blur]))
 plot
 
-ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Supercells_PNG/", 
+ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Supercells_Blur_PNG/", 
                  gsub("_Annotations", "_supercells.png", root)),  plot = plot,
        units = "px", height = nrow(data), width = ncol(data))
 
