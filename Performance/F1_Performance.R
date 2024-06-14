@@ -15,6 +15,8 @@ Clara <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/Clara_Co
 Clara_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/Clara_Blur_Counts.csv")
 Scell <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/Supercell_Counts.csv")
 Scell_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/Supercell_Blur_Counts.csv")
+Re <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/Recolorize_Counts.csv")
+Re_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/Recolorize_Blur_Counts.csv")
 
 # Calculate F1s
 rbind(
@@ -25,21 +27,25 @@ rbind(
   Clara %>% mutate(Algorithm = "Clara", Format = "Original"),
   Clara_Blur %>% mutate(Algorithm = "Clara", Format = "Blur"),
   Scell %>% mutate(Algorithm = "Supercells", Format = "Original"),
-  Scell_Blur %>% mutate(Algorithm = "Supercells", Format = "Blur")
+  Scell_Blur %>% mutate(Algorithm = "Supercells", Format = "Blur"),
+  Re %>% mutate(Algorithm = "Recolorize", Format = "Original"),
+  Re_Blur %>% mutate(Algorithm = "Recolorize", Format = "Blur")
 ) %>%
   pivot_wider(id_cols = c(Cluster, Image, Algorithm, Format), names_from = Counts, values_from = Freq) %>%
   mutate(
     Precision = `True Positive` / (`True Positive` + `False Positive`),
     Recall = `True Positive` / (`True Positive` + `False Negative`), 
-    F1 = (2 * Precision * Recall) / (Precision + Recall)
+    F1 = (2 * Precision * Recall) / (Precision + Recall),
+    BA = ((`True Positive` / (`True Positive` + `False Negative`)) + 
+         (`True Negative` / (`True Negative` + `False Positive`))) / 2
   ) %>%
-  select(Algorithm, Format, F1) %>%
+  select(Cluster, Algorithm, Format, BA) %>%
   mutate(Format = factor(Format, levels = c("Original", "Blur"))) %>%
-  ggplot(aes(x = Algorithm, y = F1, fill = Format)) +
+  ggplot(aes(x = Algorithm, y = BA, fill = Format)) +
     geom_boxplot() + 
     theme_bw() +
     ylim(c(0,1)) + 
-    xlab("") 
+    ylab("Balanced Accuracy") 
 
 
 

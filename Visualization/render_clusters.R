@@ -95,14 +95,14 @@ Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_An
   filter(Blur == "X")
 subtile <- 10
 root <- unique(Image_Metadata$Path)[subtile]
-data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Recolorize_TXT/", 
+data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Recolorize_Blur_TXT/", 
                         gsub(pattern = "Annotations", replacement = "recolorize.txt", root)))
 plot <- render_cluster(data,
                        unlist(Image_Metadata[Image_Metadata$Path == root, Color]),
-                       unlist(Image_Metadata[Image_Metadata$Path == root, Recolorize]))
+                       unlist(Image_Metadata[Image_Metadata$Path == root, Recolorize.Blur]))
 plot
 
-ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Recolorize_PNG/", 
+ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Recolorize_Blur_PNG/", 
                  gsub("_Annotations", "_recolorize.png", root)),  plot = plot,
        units = "px", height = nrow(data), width = ncol(data))
 

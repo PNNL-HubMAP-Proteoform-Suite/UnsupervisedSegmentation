@@ -132,3 +132,14 @@ Scells_Blur_Counts <- calc_wrapper(c(3:5, 10, 12, 14, 16, 20, 22, 27), "Kidney_T
                               "_supercells.txt", "Supercells.Blur")
 fwrite(Scells_Blur_Counts, "~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/Supercell_Blur_Counts.csv", quote = F, row.names = F)
 
+# Recolorize--------------------------------------------------------------------
+
+# Non-Blurred
+Re_Counts <- calc_wrapper(c(3:5, 10, 12, 14, 16, 20, 22, 27), "Kidney_Tiles/Recolorize_TXT",
+                              "_recolorize.txt", "Recolorize")
+fwrite(Re_Counts, "~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/Recolorize_Counts.csv", quote = F, row.names = F)
+
+# Non-Blurred
+Re_Blur_Counts <- calc_wrapper(c(3:5, 10, 12, 14, 16, 20, 22, 27), "Kidney_Tiles/Recolorize_Blur_TXT",
+                                   "_recolorize.txt", "Recolorize.Blur")
+fwrite(Re_Blur_Counts, "~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/Recolorize_Blur_Counts.csv", quote = F, row.names = F)
