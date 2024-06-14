@@ -98,6 +98,23 @@ lapply(1:nrow(BlurPaths), function(x) {
   )
 })
 
+################
+## RECOLORIZE ##
+################
+
+# Run unmodified and blurred images 
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/recolorize.R")
+
+lapply(1:nrow(BlurPaths), function(x) {
+  apply_recolorize(
+    in_path = BlurPaths$Path[x],
+    k = BlurPaths$ClusterNum[x],
+    out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Recolorize_Blur_TXT/",
+    blur = TRUE
+  )
+})
+
+
 ################################################################################
 ### Full study------------------------------------------------------------------
 ################################################################################
