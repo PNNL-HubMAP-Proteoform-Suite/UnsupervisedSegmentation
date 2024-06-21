@@ -17,9 +17,13 @@ Scell <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/Supercel
 Scell_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/Supercell_Blur_Counts.csv")
 Re <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/Recolorize_Counts.csv")
 Re_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/Recolorize_Blur_Counts.csv")
+PT <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/PyTorch_Counts.csv")
+PT_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/PyTorch_Blur_Counts.csv")
+PY <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/pyImSeg_Counts.csv")
+PY_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/pyImSeg_Blur_Counts.csv")
 
-# Calculate F1s
-rbind(
+# Calculate balanced accuracy 
+BA <- rbind(
   KM %>% mutate(Algorithm = "K-Means", Format = "Original"),
   KM_Blur %>% mutate(Algorithm = "K-Means", Format = "Blur"),
   KCC %>% mutate(Algorithm = "KCC", Format = "Original"),
@@ -29,23 +33,46 @@ rbind(
   Scell %>% mutate(Algorithm = "Supercells", Format = "Original"),
   Scell_Blur %>% mutate(Algorithm = "Supercells", Format = "Blur"),
   Re %>% mutate(Algorithm = "Recolorize", Format = "Original"),
-  Re_Blur %>% mutate(Algorithm = "Recolorize", Format = "Blur")
+  Re_Blur %>% mutate(Algorithm = "Recolorize", Format = "Blur"),
+  PT %>% mutate(Algorithm = "PyTorch-Tip", Format = "Original"),
+  PT_Blur %>% mutate(Algorithm = "PyTorch-Tip", Format = "Blur"),
+  PY %>% mutate(Algorithm = "PyImSeg", Format = "Original"),
+  PY_Blur %>% mutate(Algorithm = "PyImSeg", Format = "Blur")
 ) %>%
   pivot_wider(id_cols = c(Cluster, Image, Algorithm, Format), names_from = Counts, values_from = Freq) %>%
   mutate(
+    `True Positive` = ifelse(is.na(`True Positive`), 0, `True Positive`),
     Precision = `True Positive` / (`True Positive` + `False Positive`),
     Recall = `True Positive` / (`True Positive` + `False Negative`), 
     F1 = (2 * Precision * Recall) / (Precision + Recall),
     BA = ((`True Positive` / (`True Positive` + `False Negative`)) + 
-         (`True Negative` / (`True Negative` + `False Positive`))) / 2
-  ) %>%
-  select(Cluster, Algorithm, Format, BA) %>%
+         (`True Negative` / (`True Negative` + `False Positive`))) / 2,
+  ) 
+  
+
+# Make plots 
+BA %>% select(Cluster, Algorithm, Format, BA) %>%
   mutate(Format = factor(Format, levels = c("Original", "Blur"))) %>%
   ggplot(aes(x = Algorithm, y = BA, fill = Format)) +
     geom_boxplot() + 
     theme_bw() +
     ylim(c(0,1)) + 
     ylab("Balanced Accuracy") 
+
+# Calculate paired t-tests
+BA %>%
+  select(Cluster, Image, Algorithm, Format, BA) %>%
+  group_by(Algorithm) %>%
+  nest() %>%
+  arrange(Algorithm) %>%
+  mutate(
+    TTest = map_dbl(data, function(x) {
+      pairs <- x %>% 
+        pivot_wider(names_from = Format, values_from = BA, id_cols = c(Cluster, Image))
+      t.test(x = pairs$Original, y = pairs$Blur, alternative = "less", paired = TRUE)$p.value
+    })
+  ) %>%
+  select(Algorithm, TTest)
 
 
 
