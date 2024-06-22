@@ -75,7 +75,6 @@ BA %>%
   select(Algorithm, TTest)
 
 
-
 ###################
 ## FULL ANALYSIS ##
 ###################
