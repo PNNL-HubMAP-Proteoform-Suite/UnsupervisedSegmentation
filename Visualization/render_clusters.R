@@ -106,6 +106,122 @@ ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Clara
                  gsub("_Annotations", "_Clara.png", root)),  plot = plot,
        units = "px", height = nrow(data), width = ncol(data))
 
+# PyTorch-----------------------------------------------------------------------
+
+Image_Metadata <- fread("/Users/lewi052/Imaging_3D/Segmentation/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv")
+subtile <- 30
+root <- unique(Image_Metadata$Path)[subtile]
+data <- fread(file.path("/Users/lewi052/Imaging_3D/Segmentation/Pytorch_mask", gsub("_Annotations", ".csv", root)))
+colnames(data) <- c("X", "Y", "Cluster")
+Smaller <- data %>%
+  mutate(X = factor(X, levels = 1:max(X))) %>%
+  pivot_wider(id_cols = Y, names_from = X, values_from = Cluster) %>%
+  arrange(Y) %>%
+  select(-Y)
+colnames(Smaller) <- paste0("V", colnames(Smaller))
+Smaller <- rev(Smaller)
+Smaller <- apply(Smaller, 2, rev)
+Smaller <- as.data.frame(Smaller)
+fwrite(Smaller, file.path(file.path("/Users/lewi052/Imaging_3D/Segmentation/Pytorch_fixed_clusters/", 
+                                    gsub("_Annotations", ".txt", root))), quote = F, row.names = F, sep = "\t")
+
+plot <- render_cluster(Smaller,
+                       unlist(Image_Metadata[Image_Metadata$Path == root, Color]),
+                       unlist(Image_Metadata[Image_Metadata$Path == root, PyTorch]))
+plot
+
+ggsave(file.path("/Users/lewi052/Imaging_3D/Segmentation/Pytorch_fixed_clusters/", 
+                 gsub("_Annotations", ".png", root)),  plot = plot,
+       units = "px", height = nrow(Smaller), width = ncol(Smaller))
+
+# PyTorch Blur------------------------------------------------------------------
+
+Image_Metadata <- fread("/Users/lewi052/Imaging_3D/Segmentation/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv") %>%
+  filter(Blur == "X")
+subtile <- 1
+root <- unique(Image_Metadata$Path)[subtile]
+data <- fread(file.path("/Users/lewi052/Imaging_3D/Segmentation/Pytorch_mask_blurred", paste0("blurred_", gsub("_Annotations", ".csv", root))))
+colnames(data) <- c("X", "Y", "Cluster")
+Smaller <- data %>%
+  mutate(X = factor(X, levels = 1:max(X))) %>%
+  pivot_wider(id_cols = Y, names_from = X, values_from = Cluster) %>%
+  arrange(Y) %>%
+  select(-Y)
+colnames(Smaller) <- paste0("V", colnames(Smaller))
+Smaller <- rev(Smaller)
+Smaller <- apply(Smaller, 2, rev)
+Smaller <- as.data.frame(Smaller)
+fwrite(Smaller, file.path(file.path("/Users/lewi052/Imaging_3D/Segmentation/Pytorch_Blurred_fixed_clusters_masks/", 
+                                    gsub("_Annotations", ".txt", root))), quote = F, row.names = F, sep = "\t")
+
+plot <- render_cluster(Smaller,
+                       unlist(Image_Metadata[Image_Metadata$Path == root, Color]),
+                       unlist(Image_Metadata[Image_Metadata$Path == root, PyTorch.Blur]))
+plot
+
+ggsave(file.path("/Users/lewi052/Imaging_3D/Segmentation/Pytorch_Blurred_fixed_clusters/", 
+                 gsub("_Annotations", ".png", root)),  plot = plot,
+       units = "px", height = nrow(Smaller), width = ncol(Smaller))
+
+
+# pyImSeg-----------------------------------------------------------------------
+
+Image_Metadata <- fread("/Users/lewi052/Imaging_3D/Segmentation/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv")
+subtile <- 6
+root <- unique(Image_Metadata$Path)[subtile]
+data <- fread(file.path("/Users/lewi052/Imaging_3D/Segmentation/pyImSeg_masks", paste0("mask_", gsub("_Annotations", ".csv", root))))
+colnames(data) <- c("X", "Y", "Cluster")
+data$Cluster <- data$Cluster + 1
+Smaller <- data %>%
+  mutate(X = factor(X, levels = 1:max(X))) %>%
+  pivot_wider(id_cols = Y, names_from = X, values_from = Cluster) %>%
+  arrange(Y) %>%
+  select(-Y)
+colnames(Smaller) <- paste0("V", colnames(Smaller))
+Smaller <- rev(Smaller)
+Smaller <- apply(Smaller, 2, rev)
+Smaller <- as.data.frame(Smaller)
+fwrite(Smaller, file.path(file.path("/Users/lewi052/Imaging_3D/Segmentation/pyImSeg_fixed_clusters_masks/", 
+                                    gsub("_Annotations", ".txt", root))), quote = F, row.names = F, sep = "\t")
+
+plot <- render_cluster(Smaller,
+                       unlist(Image_Metadata[Image_Metadata$Path == root, Color]),
+                       unlist(Image_Metadata[Image_Metadata$Path == root, pyImSeg]))
+plot
+
+ggsave(file.path("/Users/lewi052/Imaging_3D/Segmentation/pyImSeg_fixed_clusters/", 
+                 gsub("_Annotations", ".png", root)),  plot = plot,
+       units = "px", height = nrow(Smaller), width = ncol(Smaller))
+
+# pyImSeg Blur------------------------------------------------------------------
+
+Image_Metadata <- fread("/Users/lewi052/Imaging_3D/Segmentation/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv") %>%
+  filter(Blur == "X")
+subtile <- 10
+root <- unique(Image_Metadata$Path)[subtile]
+data <- fread(file.path("/Users/lewi052/Imaging_3D/Segmentation/pyImSeg_Blurred_masks", paste0("mask_blurred_", gsub("_Annotations", ".csv", root))))
+colnames(data) <- c("X", "Y", "Cluster")
+data$Cluster <- data$Cluster + 1
+Smaller <- data %>%
+  mutate(X = factor(X, levels = 1:max(X))) %>%
+  pivot_wider(id_cols = Y, names_from = X, values_from = Cluster) %>%
+  arrange(Y) %>%
+  select(-Y)
+colnames(Smaller) <- paste0("V", colnames(Smaller))
+Smaller <- rev(Smaller)
+Smaller <- apply(Smaller, 2, rev)
+Smaller <- as.data.frame(Smaller)
+fwrite(Smaller, file.path(file.path("/Users/lewi052/Imaging_3D/Segmentation/pyImSeg_Blurred_fixed_clusters_masks/", 
+                                    gsub("_Annotations", ".txt", root))), quote = F, row.names = F, sep = "\t")
+
+plot <- render_cluster(Smaller,
+                       unlist(Image_Metadata[Image_Metadata$Path == root, Color]),
+                       unlist(Image_Metadata[Image_Metadata$Path == root, pyImSeg.Blur]))
+plot
+
+ggsave(file.path("/Users/lewi052/Imaging_3D/Segmentation/pyImSeg_Blurred_fixed_clusters/", 
+                 gsub("_Annotations", ".png", root)),  plot = plot,
+       units = "px", height = nrow(Smaller), width = ncol(Smaller))
 
 
 

@@ -2,7 +2,7 @@
 library(tidyverse)
 library(data.table)
 
-Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv")
+Metadata <- fread("/Users/lewi052/Imaging_3D/Segmentation/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv")
 
 #' @param truth A data.frame with cluster values per height (rows) and width (columns) 
 #'     for the truth data 
@@ -154,9 +154,101 @@ KCC_Blur_Counts <- do.call(rbind, lapply(c(3:5, 10, 12, 14, 16, 20, 22, 27), fun
 
 fwrite(KCC_Blur_Counts, "~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/KCC_Blur_Counts.csv", quote = F, row.names = F)
 
+# PyTorch---------------------------------------------------------------------------
 
+# Non-Blurred
+PyTorch_Counts <- do.call(rbind, lapply(c(3:5, 10, 12, 14, 16, 20, 22, 27), function(tile) {
+  
+  # Get tile name 
+  tilename <- Metadata[Metadata$Tile == tile, "Path"] %>% head(1) %>% unlist()
+  
+  message(tilename)
+  
+  # Read data
+  truth_path <- file.path("/Users/lewi052/Imaging_3D/Segmentation/Manual_Segmentation_Masks_TXT", 
+                          paste0(tilename, ".txt"))
+  truth <- fread(truth_path)
+  predicted_path <- file.path("/Users/lewi052/Imaging_3D/Segmentation/PyTorch_fixed_clusters_masks", 
+                              paste0(gsub("_Annotations", "", tilename), ".txt"))
+  predicted <- fread(predicted_path)
+  
+  truth_counts(truth, predicted, tilename, "PyTorch")
+  
+  
+}))
 
+fwrite(PyTorch_Counts, "/Users/lewi052/Imaging_3D/Segmentation/Counts/PyTorch_Counts.csv", quote = F, row.names = F)
 
+# Blurred
+PyTorch_Blurred_Counts <- do.call(rbind, lapply(c(3:5, 10, 12, 14, 16, 20, 22, 27), function(tile) {
+  
+  # Get tile name 
+  tilename <- Metadata[Metadata$Tile == tile, "Path"] %>% head(1) %>% unlist()
+  
+  message(tilename)
+  
+  # Read data
+  truth_path <- file.path("/Users/lewi052/Imaging_3D/Segmentation/Manual_Segmentation_Masks_TXT", 
+                          paste0(tilename, ".txt"))
+  truth <- fread(truth_path)
+  predicted_path <- file.path("/Users/lewi052/Imaging_3D/Segmentation/PyTorch_Blurred_fixed_clusters_masks", 
+                              paste0(gsub("_Annotations", "", tilename), ".txt"))
+  predicted <- fread(predicted_path)
+  
+  truth_counts(truth, predicted, tilename, "PyTorch.Blur")
+  
+  
+}))
+
+fwrite(PyTorch_Blurred_Counts, "/Users/lewi052/Imaging_3D/Segmentation/Counts/PyTorch_Blurred_Counts.csv", quote = F, row.names = F)
+
+# pyImSeg---------------------------------------------------------------------------
+
+# Non-Blurred
+pyImSeg_Counts <- do.call(rbind, lapply(c(3:5, 10, 12, 14, 16, 20, 22, 27), function(tile) {
+  
+  # Get tile name 
+  tilename <- Metadata[Metadata$Tile == tile, "Path"] %>% head(1) %>% unlist()
+  
+  message(tilename)
+  
+  # Read data
+  truth_path <- file.path("/Users/lewi052/Imaging_3D/Segmentation/Manual_Segmentation_Masks_TXT", 
+                          paste0(tilename, ".txt"))
+  truth <- fread(truth_path)
+  predicted_path <- file.path("/Users/lewi052/Imaging_3D/Segmentation/pyImSeg_fixed_clusters_masks", 
+                              paste0(gsub("_Annotations", "", tilename), ".txt"))
+  predicted <- fread(predicted_path)
+  
+  truth_counts(truth, predicted, tilename, "pyImSeg")
+  
+  
+}))
+
+fwrite(pyImSeg_Counts, "/Users/lewi052/Imaging_3D/Segmentation/Counts/pyImSegh_Counts.csv", quote = F, row.names = F)
+
+# Blurred
+pyImSeg_Blurred_Counts <- do.call(rbind, lapply(c(3:5, 10, 12, 14, 16, 20, 22, 27), function(tile) {
+  
+  # Get tile name 
+  tilename <- Metadata[Metadata$Tile == tile, "Path"] %>% head(1) %>% unlist()
+  
+  message(tilename)
+  
+  # Read data
+  truth_path <- file.path("/Users/lewi052/Imaging_3D/Segmentation/Manual_Segmentation_Masks_TXT", 
+                          paste0(tilename, ".txt"))
+  truth <- fread(truth_path)
+  predicted_path <- file.path("/Users/lewi052/Imaging_3D/Segmentation/pyImSeg_Blurred_fixed_clusters_masks", 
+                              paste0(gsub("_Annotations", "", tilename), ".txt"))
+  predicted <- fread(predicted_path)
+  
+  truth_counts(truth, predicted, tilename, "pyImSeg.Blur")
+  
+  
+}))
+
+fwrite(pyImSeg_Blurred_Counts, "/Users/lewi052/Imaging_3D/Segmentation/Counts/pyImSeg_Blurred_Counts.csv", quote = F, row.names = F)
 
 
 

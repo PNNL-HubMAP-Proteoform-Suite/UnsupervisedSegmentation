@@ -5,3 +5,7 @@ Images/
 Visualization/Kidney_Histology.zip
 Visualization/Kidney_Histology/
 
+pytorch_run_blur.sh
+pytorch_run.sh
+pyimseg_segmentation_algorithm_LL.py
+
