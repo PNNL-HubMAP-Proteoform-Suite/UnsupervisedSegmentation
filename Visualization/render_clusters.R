@@ -25,13 +25,13 @@ render_cluster <- function(data, colors, order) {
 # KMeans------------------------------------------------------------------------
 
 Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv")
-tile <- 30
-root <- unique(Image_Metadata$Path)[tile]
+subtile <- 1
+root <- unique(Image_Metadata$Path)[subtile]
 data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMeans_TXT", 
                         gsub(pattern = "Annotations", replacement = "KMeans.txt", root)))
 plot <- render_cluster(data,
                        unlist(Image_Metadata[Image_Metadata$Path == root, Color]),
-                       unlist(Image_Metadata[Image_Metadata$Path == root, KMeans]))
+                       unlist(Image_Metadata[Image_Metadata$Path == root, Kmeans]))
 plot
 
 ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMeans_PNG", 
@@ -76,13 +76,13 @@ ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Clara
 
 Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv") %>%
   filter(Blur == "X")
-subtile <- 1
+subtile <- 2
 root <- unique(Image_Metadata$Path)[subtile]
-data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Supercells_Blur_TXT/", 
+data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Supercells_TXT/", 
                         gsub(pattern = "Annotations", replacement = "supercells.txt", root)))
 plot <- render_cluster(data,
                        unlist(Image_Metadata[Image_Metadata$Path == root, Color]),
-                       unlist(Image_Metadata[Image_Metadata$Path == root, Supercells.Blur]))
+                       unlist(Image_Metadata[Image_Metadata$Path == root, Supercells]))
 plot
 
 ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Supercells_Blur_PNG/", 
@@ -93,7 +93,7 @@ ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Super
 
 Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv") %>%
   filter(Blur == "X")
-subtile <- 10
+subtile <- 1
 root <- unique(Image_Metadata$Path)[subtile]
 data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Recolorize_Blur_TXT/", 
                         gsub(pattern = "Annotations", replacement = "recolorize.txt", root)))
