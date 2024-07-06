@@ -79,11 +79,88 @@ assign_cluster <- function(truth, predicted) {
 
 metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv")
 
+
+## Blur Study-------------------------------------------------------------------
+
+blurred <- c(3, 5, 10, 12, 14, 16, 20, 27)
+
+kmeans_blur <- lapply(blurred, function(num) {
+  path <- unique(metadata$Path)[num]
+  path <- gsub("_Annotations", "", path, fixed = T)
+  assign_cluster(
+    truth = fread(paste0("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/", path, "_Annotations.txt")),
+    predicted = fread(paste0("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMeans_Blur_TXT/", path, "_KMeans.txt"))
+  )
+})
+fwrite(data.frame(kmeans_blur = unlist(kmeans_blur)), "~/Downloads/KMeans_Blur_Clusters.csv", row.names = F, quote = F)
+
+kcc <- lapply(blurred, function(num) {
+  path <- unique(metadata$Path)[num]
+  path <- gsub("_Annotations", "", path, fixed = T)
+  assign_cluster(
+    truth = fread(paste0("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/", path, "_Annotations.txt")),
+    predicted = fread(paste0("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KCC_TXT/", path, "_KCC.txt"))
+  )
+})
+fwrite(data.frame(kcc = unlist(kcc)), "~/Downloads/KCC_Clusters.csv", row.names = F, quote = F)
+
+kcc_blur <- lapply(blurred, function(num) {
+  path <- unique(metadata$Path)[num]
+  path <- gsub("_Annotations", "", path, fixed = T)
+  assign_cluster(
+    truth = fread(paste0("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/", path, "_Annotations.txt")),
+    predicted = fread(paste0("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KCC_Blur_TXT/", path, "_KCC.txt"))
+  )
+})
+fwrite(data.frame(kcc_blur = unlist(kcc_blur)), "~/Downloads/KCC_Blur_Clusters.csv", row.names = F, quote = F)
+
+supercells <- lapply(blurred, function(num) {
+  path <- unique(metadata$Path)[num]
+  path <- gsub("_Annotations", "", path, fixed = T)
+  assign_cluster(
+    truth = fread(paste0("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/", path, "_Annotations.txt")),
+    predicted = fread(paste0("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Supercells_TXT/", path, "_supercells.txt"))
+  )
+})
+fwrite(data.frame(supercells = unlist(supercells)), "~/Downloads/Supercells_Clusters.csv", row.names = F, quote = F)
+
+supercells_blur <- lapply(blurred, function(num) {
+  path <- unique(metadata$Path)[num]
+  path <- gsub("_Annotations", "", path, fixed = T)
+  assign_cluster(
+    truth = fread(paste0("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/", path, "_Annotations.txt")),
+    predicted = fread(paste0("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Supercells_Blur_TXT/", path, "_supercells.txt"))
+  )
+})
+fwrite(data.frame(supercells_blur = unlist(supercells_blur)), "~/Downloads/Supercells_Blur_Clusters.csv", row.names = F, quote = F)
+
+recolorize <- lapply(blurred, function(num) {
+  path <- unique(metadata$Path)[num]
+  path <- gsub("_Annotations", "", path, fixed = T)
+  assign_cluster(
+    truth = fread(paste0("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/", path, "_Annotations.txt")),
+    predicted = fread(paste0("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Recolorize_TXT/", path, "_recolorize.txt"))
+  )
+})
+fwrite(data.frame(recolorize = unlist(recolorize)), "~/Downloads/Recolorize_Clusters.csv", row.names = F, quote = F)
+
+recolorize_blur <- lapply(blurred, function(num) {
+  path <- unique(metadata$Path)[num]
+  path <- gsub("_Annotations", "", path, fixed = T)
+  assign_cluster(
+    truth = fread(paste0("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/", path, "_Annotations.txt")),
+    predicted = fread(paste0("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Recolorize_Blur_TXT/", path, "_recolorize.txt"))
+  )
+})
+fwrite(data.frame(recolorize_blur = unlist(recolorize_blur)), "~/Downloads/Recolorize_Blur_Clusters.csv", row.names = F, quote = F)
+
+
+
 #############
 ## K-MEANS ##
 #############
 
-correct_order <- lapply(2:30, function(num) {
+kmeans <- lapply(2:30, function(num) {
   path <- unique(metadata$Path)[num]
   path <- gsub("_Annotations", "", path, fixed = T)
   assign_cluster(
