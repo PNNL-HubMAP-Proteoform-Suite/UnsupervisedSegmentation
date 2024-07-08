@@ -1,6 +1,8 @@
 library(tidyverse)
 library(data.table)
 library(gtools)
+library(doParallel)
+library(foreach)
 
 assign_cluster <- function(truth, predicted) {
   
@@ -89,17 +91,39 @@ metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotati
 
 ## Blur Study-------------------------------------------------------------------
 
-blurred <- c(3)
+blurred <- metadata %>% filter(Blur == "X") %>% select(Tile) %>% unlist() %>% unique() 
 
-kmeans_blur <- lapply(blurred, function(num) {
+registerDoParallel(detectCores())
+
+foreach(num = c(4,22)) %dopar% {
+  
   path <- unique(metadata$Path)[num]
   path <- gsub("_Annotations", "", path, fixed = T)
-  assign_cluster(
-    truth = fread(paste0("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/", path, "_Annotations.txt")),
-    predicted = fread(paste0("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMeans_Blur_TXT/", path, "_KMeans.txt"))
-  )
-})
-fwrite(data.frame(kmeans_blur = unlist(kmeans_blur)), "~/Downloads/KMeans_Blur_Clusters.csv", row.names = F, quote = F)
+  
+  # NO BLUR
+  data.frame(
+    kmeans = assign_cluster(
+      truth = fread(paste0("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/", path, "_Annotations.txt")),
+      predicted = fread(paste0("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMeans_TXT/", path, "_KMeans.txt"))
+    )
+  ) %>% write.csv(file.path("/Users/degn400/Downloads/kmeans", paste0(path, ".csv")), row.names = F, quote = F)
+  
+  # BLUR
+  data.frame(
+    kmeans_blur = assign_cluster(
+      truth = fread(paste0("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/", path, "_Annotations.txt")),
+      predicted = fread(paste0("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMeans_Blur_TXT/", path, "_KMeans.txt"))
+    )
+  ) %>% write.csv(file.path("/Users/degn400/Downloads/kmeans_blur", paste0(path, ".csv")), row.names = F, quote = F)
+  
+}
+
+stopCluster()
+
+
+
+
+
 
 kcc <- lapply(blurred, function(num) {
   path <- unique(metadata$Path)[num]
