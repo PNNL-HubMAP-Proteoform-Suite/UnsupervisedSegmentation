@@ -16,13 +16,15 @@ assign_cluster <- function(truth, predicted) {
   # Merge data.frames for counts 
   toCalc <- left_join(
     make_pivot(truth) %>% rename(TrueCluster = Cluster),
-    make_pivot(predicted) %>% rename(PredictedCluster = Cluster),
+    make_pivot(predicted) %>% 
+      rename(PredictedCluster = Cluster) %>% 
+      mutate(PredictedCluster = map_chr(PredictedCluster, function(x) {LETTERS[x]})),
     by = c("Height", "Width")
   )
   
   # Get every arrangement of clusters 
-  k <- max(toCalc$PredictedCluster)
-  arr <- permutations(k, k, v = 1:k)
+  k <- length(unique(toCalc$PredictedCluster))
+  arr <- permutations(k, k, v = LETTERS[1:k])
   message(paste("...The number of rows is", nrow(arr)))
   
   # Get a balanced accuracy per arrangement
@@ -34,8 +36,8 @@ assign_cluster <- function(truth, predicted) {
     test <- toCalc
 
     # Make replacements    
-    mylist <- arr[row,]
-    names(mylist) <- 1:k
+    mylist <- 1:k
+    names(mylist) <- arr[row,]
     
     # Apply replacements
     test <- test %>% mutate(PredictedCluster = map_int(PredictedCluster, function(x) {mylist[[x]]}))
@@ -69,11 +71,16 @@ assign_cluster <- function(truth, predicted) {
     
   }) %>% unlist()
   
-  message(paste("...The max BA was", max(BA_Values)))
+  score_matrix <- data.frame(arr) %>%
+    mutate(Scores = BA_Values)
+  
+  message(paste("...The max BA was", max(BA_Values))) 
   
   # Fix the clusters to the new order
   true_order <- arr[which.max(BA_Values),]
-  return(true_order)
+  
+  return(match(true_order, LETTERS))
+  
   
 }
 
@@ -82,7 +89,7 @@ metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotati
 
 ## Blur Study-------------------------------------------------------------------
 
-blurred <- c(3, 5, 10, 12, 14, 16, 20, 27)
+blurred <- c(3)
 
 kmeans_blur <- lapply(blurred, function(num) {
   path <- unique(metadata$Path)[num]
@@ -160,7 +167,7 @@ fwrite(data.frame(recolorize_blur = unlist(recolorize_blur)), "~/Downloads/Recol
 ## K-MEANS ##
 #############
 
-kmeans <- lapply(2:30, function(num) {
+kmeans <- lapply(blurred, function(num) {
   path <- unique(metadata$Path)[num]
   path <- gsub("_Annotations", "", path, fixed = T)
   assign_cluster(
