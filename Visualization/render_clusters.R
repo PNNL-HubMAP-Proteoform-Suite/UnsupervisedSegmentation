@@ -24,7 +24,7 @@ render_cluster <- function(data, colors, order) {
 
 # KMeans------------------------------------------------------------------------
 
-target <- 1
+target <- 2
 
 Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv") %>%
   filter(Blur == "X")
@@ -135,7 +135,7 @@ lapply(target, function(subtile) {
 
 
 
-# Superpixels-------------------------------------------------------------------
+# Supercells---------------------------------------------------------------------
 
 Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv") %>%
   filter(Blur == "X")
