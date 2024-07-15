@@ -84,6 +84,10 @@ calc_wrapper <- function(image_num, subfolder, tag, column_name) {
   
 }
 
+##########
+## BLUR ##
+##########
+
 # K-Means-----------------------------------------------------------------------
 
 # Non-Blurred
@@ -168,5 +172,8 @@ PyTorch_Blur_Counts <- calc_wrapper(c(3:5, 10, 12, 14, 16, 20, 22, 27), "Kidney_
                                     ".txt", "PyTorch.Blur")
 fwrite(PyTorch_Blur_Counts, "~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/PyTorch_Blur_Counts.csv", quote = F, row.names = F)
 
+################
+## FULL STUDY ##
+################
 
 

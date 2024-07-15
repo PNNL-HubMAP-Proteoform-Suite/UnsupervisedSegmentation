@@ -6,21 +6,21 @@ library(data.table)
 #####################
 
 # Load and format data
-KM_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/KMeans_Blur_Counts.csv")
-KM <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/KMeans_Counts.csv") %>% 
+KM_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Blur_Counts/KMeans_Blur_Counts.csv")
+KM <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Blur_Counts/KMeans_Counts.csv") %>% 
   filter(Image %in% KM_Blur$Image)
-KCC <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/KCC_Counts.csv")
-KCC_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/KCC_Blur_Counts.csv")
-Clara <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/Clara_Counts.csv")
-Clara_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/Clara_Blur_Counts.csv")
-Scell <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/Supercell_Counts.csv")
-Scell_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/Supercell_Blur_Counts.csv")
-Re <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/Recolorize_Counts.csv")
-Re_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/Recolorize_Blur_Counts.csv")
-PT <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/PyTorch_Counts.csv")
-PT_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/PyTorch_Blur_Counts.csv")
-PY <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/pyImSeg_Counts.csv")
-PY_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/pyImSeg_Blur_Counts.csv")
+KCC <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Blur_Counts/KCC_Counts.csv")
+KCC_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Blur_Counts/KCC_Blur_Counts.csv")
+Clara <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Blur_Counts/Clara_Counts.csv")
+Clara_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Blur_Counts/Clara_Blur_Counts.csv")
+Scell <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Blur_Counts/Supercell_Counts.csv")
+Scell_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Blur_Counts/Supercell_Blur_Counts.csv")
+Re <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Blur_Counts/Recolorize_Counts.csv")
+Re_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Blur_Counts/Recolorize_Blur_Counts.csv")
+PT <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Blur_Counts/PyTorch_Counts.csv")
+PT_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Blur_Counts/PyTorch_Blur_Counts.csv")
+PY <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Blur_Counts/PyImSeg_Counts.csv")
+PY_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Blur_Counts/PyImSeg_Blur_Counts.csv")
 
 # Calculate balanced accuracy 
 BA <- rbind(
@@ -52,9 +52,11 @@ BA <- rbind(
 
 # Make plots 
 BA %>% select(Cluster, Algorithm, Format, BA) %>%
-  mutate(Format = factor(Format, levels = c("Original", "Blur"))) %>%
+  mutate(Format = factor(Format, levels = c("Original", "Blur")),
+         Cluster = as.factor(Cluster)) %>%
   ggplot(aes(x = Algorithm, y = BA, fill = Format)) +
-    geom_boxplot() + 
+    geom_boxplot() + #outlier.shape = NA) + 
+    #geom_point(position = position_jitterdodge()) +
     theme_bw() +
     ylim(c(0,1)) + 
     ylab("Balanced Accuracy") 
