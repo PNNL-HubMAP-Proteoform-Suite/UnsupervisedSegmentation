@@ -119,6 +119,19 @@ lapply(1:nrow(BlurPaths), function(x) {
 ### Full study------------------------------------------------------------------
 ################################################################################
 
+# No need to re-run blur images! 
+targets <- Image_Metadata %>% filter(Blur != "X") %>% select(Path) %>% unique() %>% unlist() 
+Meta <- Image_Metadata %>% filter(Path %in% targets)
+Paths <- Meta %>%
+  select(Path, ManualClusterNumber) %>%
+  group_by(Path) %>%
+  summarize(ClusterNum = n()) %>%
+  ungroup() %>%
+  mutate(
+    Path = paste0("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Original/", Path, ".png"),
+    Path = gsub("_Annotations", "", Path)
+  ) 
+
 #############
 ## K-MEANS ##
 #############
@@ -126,14 +139,14 @@ lapply(1:nrow(BlurPaths), function(x) {
 # Source function
 source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/kmeans.R")
 
-lapply(1:nrow(Image_Paths), function(x) {
+lapply(1:nrow(Paths), function(x) {
   apply_kmeans(
-    in_path = Image_Paths$Path[x],
-    k = Image_Paths$ClusterNum[x],
-    out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMeans_TXT/"
+    in_path = Paths$Path[x],
+    k = Paths$ClusterNum[x],
+    out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMeans_TXT/",
+    blur = FALSE
   )
 })
-
 
 #########
 ## KCC ##
@@ -144,12 +157,77 @@ source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/kcc.R")
 
 cl <- makeCluster(6)
 registerDoParallel(cl)
-foreach(x = 1:nrow(Image_Paths)) %dopar% {
+foreach(x = 1:nrow(Paths)) %dopar% {
   apply_kcc(
-    in_path = Image_Paths$Path[x],
-    k = Image_Paths$ClusterNum[x],
-    out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KCC_TXT/"
+    in_path = Paths$Path[x],
+    k = Paths$ClusterNum[x],
+    out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KCC_Blur_TXT/",
+    blur = TRUE
   )
 }
 stopCluster(cl)
+
+###########
+## CLARA ##
+###########
+
+# Source function
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/clara.R")
+
+cl <- makeCluster(6)
+registerDoParallel(cl)
+foreach(x = 1:nrow(Paths)) %dopar% {
+  apply_clara(
+    in_path = Paths$Path[x],
+    k = Paths$ClusterNum[x],
+    out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Clara_TXT/",
+    blur = FALSE
+  )
+}
+stopCluster(cl)
+
+################
+## SUPERCELLS ##
+################
+
+# Source function
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/supercells.R")
+
+cl <- makeCluster(6)
+registerDoParallel(cl)
+foreach(x = 1:nrow(Paths)) %dopar% {
+  apply_supercells(
+    in_path = Paths$Path[x],
+    k = Paths$ClusterNum[x],
+    out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Supercells_TXT/",
+    blur = FALSE
+  )
+}
+stopCluster(cl)
+
+################
+## RECOLORIZE ##
+################
+
+# Source function
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/recolorize.R")
+
+cl <- makeCluster(6)
+registerDoParallel(cl)
+foreach(x = 1:nrow(Paths)) %dopar% {
+  apply_recolorize(
+    in_path = Paths$Path[x],
+    k = Paths$ClusterNum[x],
+    out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Recolorize_TXT/",
+    blur = FALSE
+  )
+}
+stopCluster(cl)
+
+
+
+
+
+
+
 

@@ -24,10 +24,10 @@ render_cluster <- function(data, colors, order) {
 
 # KMeans------------------------------------------------------------------------
 
-target <- 10
+target <- 1
 
 Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv") %>%
-  filter(Blur == "X")
+  filter(Blur != "X")
 
 lapply(target, function(subtile) {
   
@@ -45,41 +45,41 @@ lapply(target, function(subtile) {
   
 })
 
-lapply(target, function(subtile) {
-  
-  root <- unique(Image_Metadata$Path)[subtile]
-  data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMeans_Blur_TXT/", 
-                          gsub(pattern = "Annotations", replacement = "KMeans.txt", root)))
-  plot <- render_cluster(data,
-                         unlist(Image_Metadata[Image_Metadata$Path == root, Color]),
-                         unlist(Image_Metadata[Image_Metadata$Path == root, Kmeans.Blur]))
-  plot
-  
-  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMeans_Blur_PNG", 
-                   gsub("_Annotations", "_KMeans.png", root)),  plot = plot,
-         units = "px", height = nrow(data), width = ncol(data))
-  
-})
+#lapply(target, function(subtile) {
+#  
+#  root <- unique(Image_Metadata$Path)[subtile]
+#  data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMeans_Blur_TXT/", 
+#                          gsub(pattern = "Annotations", replacement = "KMeans.txt", root)))
+#  plot <- render_cluster(data,
+#                         unlist(Image_Metadata[Image_Metadata$Path == root, Color]),
+#                         unlist(Image_Metadata[Image_Metadata$Path == root, Kmeans.Blur]))
+#  plot
+#  
+#  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMeans_Blur_PNG", 
+#                   gsub("_Annotations", "_KMeans.png", root)),  plot = plot,
+#         units = "px", height = nrow(data), width = ncol(data))
+#  
+#})
 
 
 # KCC---------------------------------------------------------------------------
 
 Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv") %>%
-  filter(Blur == "X")
+  filter(Blur != "X")
 
-lapply(target, function(subtile) {
-  
-  root <- unique(Image_Metadata$Path)[subtile]
-  data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KCC_TXT/", 
-                          gsub(pattern = "Annotations", replacement = "KCC.txt", root)))
-  plot <- render_cluster(data,
-                         unlist(Image_Metadata[Image_Metadata$Path == root, Color]),
-                         unlist(Image_Metadata[Image_Metadata$Path == root, KCC]))
-  
-  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KCC_PNG/", 
-                   gsub("_Annotations", "_KCC.png", root)),  plot = plot,
-         units = "px", height = nrow(data), width = ncol(data))
-})
+#lapply(target, function(subtile) {
+#  
+#  root <- unique(Image_Metadata$Path)[subtile]
+#  data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KCC_TXT/", 
+#                          gsub(pattern = "Annotations", replacement = "KCC.txt", root)))
+#  plot <- render_cluster(data,
+#                         unlist(Image_Metadata[Image_Metadata$Path == root, Color]),
+#                         unlist(Image_Metadata[Image_Metadata$Path == root, KCC]))
+#  
+#  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KCC_PNG/", 
+#                   gsub("_Annotations", "_KCC.png", root)),  plot = plot,
+#         units = "px", height = nrow(data), width = ncol(data))
+#})
 
 lapply(target, function(subtile) {
   
@@ -99,7 +99,7 @@ lapply(target, function(subtile) {
 # Clara-------------------------------------------------------------------------
 
 Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv") %>%
-  filter(Blur == "X")
+  filter(Blur != "X")
 
 lapply(target, function(subtile) {
 
@@ -117,28 +117,28 @@ lapply(target, function(subtile) {
   
 })
 
-lapply(target, function(subtile) {
-  
-  root <- unique(Image_Metadata$Path)[subtile]
-  data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Clara_Blur_TXT/", 
-                          gsub(pattern = "Annotations", replacement = "Clara.txt", root)))
-  plot <- render_cluster(data,
-                         unlist(Image_Metadata[Image_Metadata$Path == root, Color]),
-                         unlist(Image_Metadata[Image_Metadata$Path == root, Clara.Blur]))
-  plot
-  
-  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Clara_Blur_PNG/", 
-                   gsub("_Annotations", "_Clara.png", root)),  plot = plot,
-         units = "px", height = nrow(data), width = ncol(data))
-  
-})
+#lapply(target, function(subtile) {
+#  
+#  root <- unique(Image_Metadata$Path)[subtile]
+#  data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Clara_Blur_TXT/", 
+#                          gsub(pattern = "Annotations", replacement = "Clara.txt", root)))
+#  plot <- render_cluster(data,
+#                         unlist(Image_Metadata[Image_Metadata$Path == root, Color]),
+#                         unlist(Image_Metadata[Image_Metadata$Path == root, Clara.Blur]))
+#  plot
+#  
+#  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Clara_Blur_PNG/", 
+#                   gsub("_Annotations", "_Clara.png", root)),  plot = plot,
+#         units = "px", height = nrow(data), width = ncol(data))
+#  
+#})
 
 
 
 # Supercells---------------------------------------------------------------------
 
 Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv") %>%
-  filter(Blur == "X")
+  filter(Blur != "X")
 
 lapply(target, function(subtile) {
   root <- unique(Image_Metadata$Path)[subtile]
@@ -155,24 +155,24 @@ lapply(target, function(subtile) {
 })
 
 
-lapply(target, function(subtile) {
-  root <- unique(Image_Metadata$Path)[subtile]
-  data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Supercells_Blur_TXT/", 
-                          gsub(pattern = "Annotations", replacement = "supercells.txt", root)))
-  plot <- render_cluster(data,
-                         unlist(Image_Metadata[Image_Metadata$Path == root, Color]),
-                         unlist(Image_Metadata[Image_Metadata$Path == root, Supercells.Blur]))
-  plot
-  
-  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Supercells_Blur_PNG/", 
-                   gsub("_Annotations", "_supercells.png", root)),  plot = plot,
-         units = "px", height = nrow(data), width = ncol(data))
-})
+#lapply(target, function(subtile) {
+#  root <- unique(Image_Metadata$Path)[subtile]
+#  data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Supercells_Blur_TXT/", 
+#                          gsub(pattern = "Annotations", replacement = "supercells.txt", root)))
+#  plot <- render_cluster(data,
+#                         unlist(Image_Metadata[Image_Metadata$Path == root, Color]),
+#                         unlist(Image_Metadata[Image_Metadata$Path == root, Supercells.Blur]))
+#  plot
+#  
+#  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Supercells_Blur_PNG/", 
+#                   gsub("_Annotations", "_supercells.png", root)),  plot = plot,
+#         units = "px", height = nrow(data), width = ncol(data))
+#})
 
 # Recolorize--------------------------------------------------------------------
 
 Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv") %>%
-  filter(Blur == "X")
+  filter(Blur != "X")
 
 lapply(target, function(subtile) {
   
@@ -190,26 +190,26 @@ lapply(target, function(subtile) {
   
 })
 
-lapply(target, function(subtile) {
-
-  root <- unique(Image_Metadata$Path)[subtile]
-  data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Recolorize_Blur_TXT/", 
-                          gsub(pattern = "Annotations", replacement = "recolorize.txt", root)))
-  plot <- render_cluster(data,
-                         unlist(Image_Metadata[Image_Metadata$Path == root, Color]),
-                         unlist(Image_Metadata[Image_Metadata$Path == root, Recolorize.Blur]))
-  plot
-  
-  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Recolorize_Blur_PNG/", 
-                   gsub("_Annotations", "_recolorize.png", root)),  plot = plot,
-         units = "px", height = nrow(data), width = ncol(data))
-  
-})
+#lapply(target, function(subtile) {
+#
+#  root <- unique(Image_Metadata$Path)[subtile]
+#  data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Recolorize_Blur_TXT/", 
+#                          gsub(pattern = "Annotations", replacement = "recolorize.txt", root)))
+#  plot <- render_cluster(data,
+#                         unlist(Image_Metadata[Image_Metadata$Path == root, Color]),
+#                         unlist(Image_Metadata[Image_Metadata$Path == root, Recolorize.Blur]))
+#  plot
+#  
+#  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Recolorize_Blur_PNG/", 
+#                   gsub("_Annotations", "_recolorize.png", root)),  plot = plot,
+#         units = "px", height = nrow(data), width = ncol(data))
+#  
+#})
 
 # PyTorchTip--------------------------------------------------------------------
 
 Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv") %>%
-  filter(Blur == "X")
+  filter(Blur != "X")
 
 lapply(target, function(subtile) {
   
@@ -227,26 +227,26 @@ lapply(target, function(subtile) {
 })
 
 
-lapply(target, function(subtile) {
-  
-  root <- unique(Image_Metadata$Path)[subtile]
-  newroot <- gsub("_Annotations", "", root)
-  data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/PyTorch_Blur_TXT/",  paste0(newroot, ".txt")))
-  plot <- render_cluster(data,
-                         unlist(Image_Metadata[Image_Metadata$Path == root, Color]),
-                         unlist(Image_Metadata[Image_Metadata$Path == root, PyTorch.Blur]))
-  plot
-  
-  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/PyTorch_Blur_PNG/",  paste0(newroot, ".png")),  plot = plot,
-         units = "px", height = nrow(data), width = ncol(data))
-  
-})
+#lapply(target, function(subtile) {
+#  
+#  root <- unique(Image_Metadata$Path)[subtile]
+#  newroot <- gsub("_Annotations", "", root)
+#  data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/PyTorch_Blur_TXT/",  paste0(newroot, ".txt")))
+#  plot <- render_cluster(data,
+#                         unlist(Image_Metadata[Image_Metadata$Path == root, Color]),
+#                         unlist(Image_Metadata[Image_Metadata$Path == root, PyTorch.Blur]))
+#  plot
+#  
+#  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/PyTorch_Blur_PNG/",  paste0(newroot, ".png")),  plot = plot,
+#         units = "px", height = nrow(data), width = ncol(data))
+#  
+#})
 
 
 # PyImSeg--------------------------------------------------------------------
 
 Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv") %>%
-  filter(Blur == "X")
+  filter(Blur != "X")
 
 lapply(target, function(subtile) {
   
@@ -264,18 +264,18 @@ lapply(target, function(subtile) {
 })
 
 
-lapply(target, function(subtile) {
-  
-  root <- unique(Image_Metadata$Path)[subtile]
-  newroot <- gsub("_Annotations", "", root)
-  data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/pyImSeg_Blur_TXT/", paste0(newroot, ".txt")))
-  plot <- render_cluster(data,
-                         unlist(Image_Metadata[Image_Metadata$Path == root, Color]),
-                         unlist(Image_Metadata[Image_Metadata$Path == root, PyImSeg.Blur]))
-  plot
-  
-  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/pyImSeg_Blur_PNG/", paste0(newroot, ".png")),  plot = plot,
-         units = "px", height = nrow(data), width = ncol(data))
-  
-})
+#lapply(target, function(subtile) {
+#  
+#  root <- unique(Image_Metadata$Path)[subtile]
+#  newroot <- gsub("_Annotations", "", root)
+#  data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/pyImSeg_Blur_TXT/", paste0(newroot, ".txt")))
+#  plot <- render_cluster(data,
+#                         unlist(Image_Metadata[Image_Metadata$Path == root, Color]),
+#                         unlist(Image_Metadata[Image_Metadata$Path == root, PyImSeg.Blur]))
+#  plot
+#  
+#  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/pyImSeg_Blur_PNG/", paste0(newroot, ".png")),  plot = plot,
+#         units = "px", height = nrow(data), width = ncol(data))
+#  
+#})
 
