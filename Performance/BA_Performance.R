@@ -1,5 +1,8 @@
 library(tidyverse)
 library(data.table)
+library(ggsignif)
+library(patchwork)
+library(cowplot)
 
 #####################
 ## BLUR COMPARISON ##
@@ -81,50 +84,97 @@ BA %>%
 ## FULL ANALYSIS ##
 ###################
 
-data <- do.call(rbind, lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Performance/Counts/", full.names = T), function(file) {
+# Load all files
+all_counts <- do.call(rbind, lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Performance/Full_Counts/", full.names = T), function(file) {
   data <- fread(file)
   data$Method <- strsplit(file, "/", fixed = T) %>% unlist() %>% tail(1) %>% gsub(pattern = "_Counts.csv", replacement = "")
   return(data)
-}))
-  
-Stats_Table <- data %>% 
+})) %>%
+  mutate(Method = ifelse(Method == "KCC_Blur", "KCC with Blur", Method))
+
+# Calculate balanced accuracies  
+Stats_Table <- all_counts %>% 
   pivot_wider(id_cols = c(Cluster, Image, Method), names_from = Counts, values_from = Freq) %>%
   mutate(
-    Precision = `True Positive` / (`True Positive` + `False Positive`),
-    Recall = `True Positive` / (`True Positive` + `False Negative`), 
-    F1 = (2 * Precision * Recall) / (Precision + Recall),
-    F1 = ifelse(is.nan(F1), 0, F1),
-    TPR = Recall, 
-    TNR = `True Negative` / (`True Negative` + `False Positive`),
-    Precision = round(Precision, 4),
-    Recall = round(Recall, 4),
-    F1 = round(F1, 4),
-    TPR = round(TPR, 4),
-    TNR = round(TNR, 4)
+    BA = ((`True Positive` / (`True Positive` + `False Negative`)) + 
+            (`True Negative` / (`True Negative` + `False Positive`))) / 2,
   )
   
 # Make plots--------------------------------------------------------------------
 
+# Check assumptions of ANOVA
+Check <- Stats_Table %>% 
+  select(Method, BA) %>%
+  filter(!is.na(BA)) %>%
+  group_by(Method) %>%
+  mutate(Residuals = BA - mean(BA))
+plot(qqnorm(Check$Residuals))
+qqline(Check$Residuals) # Normality assumption is ok
+ggplot(Check, aes(x = Method, y = Residuals)) + geom_boxplot() + theme_bw() # Equal variance is ok
+
+# Calculate an ANOVA and get the p-values for the multiple comparison adjustment 
+myanova <- lm(BA~Method, data = Stats_Table)
+summary(myanova)
+TukeyHSD(aov(BA~Method, data = Stats_Table))
+
+Stats_Table %>%
+  group_by(Method) %>%
+  summarise(`Median BA` = median(BA, na.rm = T)) %>%
+  arrange(-`Median BA`)
+
+# Order plot 
+Overview_Plot <- Stats_Table %>%
+  mutate(Method = factor(Method, levels = c("Recolorize", "KCC with Blur", "KMeans", 
+                                            "Supercells", "PyImSeg", "Clara", "PyTorch"))) %>%
+    ggplot(aes(x = Method, y = BA, fill = Method)) + 
+    geom_boxplot() +
+    geom_signif(comparisons = list(c("Clara", "KCC with Blur"), c("Clara", "Recolorize"),
+                                   c("PyTorch", "KCC with Blur"), c("PyTorch", "Recolorize")),
+                annotations = "***", textsize = 8) +
+    theme_bw() +
+    ylim(c(0, 1.1)) +
+    theme(legend.position = "none") +
+    ylab("Balanced Accuracy") + 
+    xlab("") + 
+    theme(axis.text.x = element_text(size = 14), axis.text.y = element_text(size = 14),
+          axis.title.y = element_text(size = 18))
+
+Overview_Plot
+
+# Make a correlation matrix
+
+
+
+
+Corrplot <- ggcorrplot(pvalmat, hc.order = TRUE, type = "full", lab = TRUE, show.legend = FALSE, colors = c("white", "blue", "red"))
+Corrplot
+
+
+
+
+
 PerformancePlot <- rbind(
   left_join(
-    Stats_Table %>% filter(Cluster == 1) %>% select(Image, Method, F1),
+    Stats_Table %>% filter(Cluster == 1) %>% select(Image, Method, BA),
     Stats_Table %>% group_by(Image, Method) %>% summarize(`Number of Clusters` = n())
   ) %>% mutate(Type = "Background Cluster"),
   left_join(
-    Stats_Table %>% filter(Cluster != 1) %>% select(Image, Method, F1) %>% group_by(Image, Method) %>% summarise(F1 = mean(F1, na.rm = T)),
-    Stats_Table %>% group_by(Image) %>% summarize(`Number of Clusters` = n())
-  ) %>% mutate(Type = "Feature Clusters (Mean)")
+    Stats_Table %>% filter(Cluster != 1) %>% select(Image, Method, BA),
+    Stats_Table %>% group_by(Image, Method) %>% summarize(`Number of Clusters` = n())
+  ) %>% mutate(Type = "Feature Clusters")
 ) %>%
   mutate(`Number of Clusters` = as.factor(`Number of Clusters`)) %>%
-  ggplot(aes(x = `Number of Clusters`, y = F1, fill = `Number of Clusters`)) +
-    geom_boxplot() + 
-    geom_jitter(width = 0.1, height = 0.05) + 
+  ggplot(aes(x = `Number of Clusters`, y = BA, fill = `Number of Clusters`)) +
+    geom_boxplot() +
     theme_bw() +
     ylim(c(0, 1)) +
-    theme(legend.position = "none", plot.title = element_text(hjust = 0.5)) +
-    facet_grid(rows = vars(Method), cols = vars(Type))
+    theme(legend.position = "none") +
+    facet_grid(cols = vars(Method), rows = vars(Type)) + 
+    ylab("Balanced Accuracy") 
 
 PerformancePlot
+
+
 
 
 

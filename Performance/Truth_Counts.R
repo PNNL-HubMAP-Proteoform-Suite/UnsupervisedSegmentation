@@ -194,7 +194,7 @@ fwrite(Supercells, "~/Git_Repos/UnsupervisedSegmentation/Performance/Full_Counts
 
 # Recolorize-------------------------------------------------------------------
 Recolorize <- calc_wrapper(1:30, "Kidney_Tiles/Recolorize_TXT", "_recolorize.txt", "Recolorize")
-fwrite(Supercells, "~/Git_Repos/UnsupervisedSegmentation/Performance/Full_Counts/Recolorize_Counts.csv", quote = F, row.names = F)
+fwrite(Recolorize, "~/Git_Repos/UnsupervisedSegmentation/Performance/Full_Counts/Recolorize_Counts.csv", quote = F, row.names = F)
 
 # PyImSeg-----------------------------------------------------------------------
 PyImSeg <- calc_wrapper(1:30, "Kidney_Tiles/pyImSeg_TXT", ".txt", "PyImSeg")
