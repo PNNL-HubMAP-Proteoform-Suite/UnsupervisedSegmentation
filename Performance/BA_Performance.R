@@ -1,8 +1,7 @@
 library(tidyverse)
 library(data.table)
 library(ggsignif)
-library(patchwork)
-library(cowplot)
+library(ggcorrplot)
 
 #####################
 ## BLUR COMPARISON ##
@@ -58,10 +57,10 @@ BA %>% select(Cluster, Algorithm, Format, BA) %>%
   mutate(Format = factor(Format, levels = c("Original", "Blur")),
          Cluster = as.factor(Cluster)) %>%
   ggplot(aes(x = Algorithm, y = BA, fill = Format)) +
-    geom_boxplot() + #outlier.shape = NA) + 
-    #geom_point(position = position_jitterdodge()) +
+    geom_boxplot() + 
+    geom_signif(xmin = 2.8, xmax = 3.2, y_position = 1.01, annotation = "***") +
     theme_bw() +
-    ylim(c(0,1)) + 
+    ylim(c(0,1.05)) + 
     ylab("Balanced Accuracy") 
 
 # Calculate paired t-tests
@@ -142,12 +141,13 @@ Overview_Plot <- Stats_Table %>%
 Overview_Plot
 
 # Make a correlation matrix
-
-
-
-
-Corrplot <- ggcorrplot(pvalmat, hc.order = TRUE, type = "full", lab = TRUE, show.legend = FALSE, colors = c("white", "blue", "red"))
-Corrplot
+Stats_Table %>%
+  select(Cluster, Image, Method, BA) %>%
+  mutate(BA = ifelse(is.na(BA), 0, BA)) %>%
+  pivot_wider(id_cols = c(Cluster, Image), names_from = Method, values_from = BA) %>%
+  select(-c(Cluster, Image)) %>%
+  cor(method = "pearson") %>%
+  ggcorrplot(hc.order = TRUE, type = "full", lab = TRUE, legend.title = "Pearson\nCorrelation")
 
 
 
