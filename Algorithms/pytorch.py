@@ -1,3 +1,8 @@
+# pytorch-tip script
+# code taken from: https://github.com/kanezaki/pytorch-unsupervised-segmentation/tree/master?tab=readme-ov-file
+
+# Example command: python demo.py  --minLabels 5 --nChannel 8 --input "/Users/lewi052/Imaging_3D/Segmentation/Original/KPMP_uS-X001Y006.png" --output_image /Users/lewi052/Imaging_3D/Segmentation/Pytorch_mask/KPMP_uS-X001Y006.png --visualize 0
+
 #from __future__ import print_function
 import argparse
 import torch

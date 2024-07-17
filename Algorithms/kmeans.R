@@ -1,19 +1,18 @@
 #' @param in_path Path to the input image 
-#' @param k Number of clusters 
+#' @param k Number of clusters
 #' @param out_path Path to place the segmented image data.frame
 #' @param blur A boolean (TRUE/FALSE) to indicate whether the image should be blurred or not 
-apply_kcc <- function(in_path, k, out_path, blur) {
+apply_kmeans <- function(in_path, k, out_path, blur) {
   
   # Image processing libraries
-  library(flexclust)
-  library(magick)
   library(png)
+  library(magick)
   
   # Data processing libraries 
   library(tidyverse)
   library(data.table)
   library(uuid)
-  
+
   # If blur, make and read the blurred image 
   if (blur) {
     
@@ -25,7 +24,7 @@ apply_kcc <- function(in_path, k, out_path, blur) {
     blurred <- image_blur(img, radius = 100, sigma = 10)
     path <- tempdir()
     image_write(blurred, file.path(path, id), format = "png")
-    
+
     # Read blurred image
     imgRead <- readPNG(file.path(path, id))
     
@@ -53,11 +52,11 @@ apply_kcc <- function(in_path, k, out_path, blur) {
   Img_DF$Y <- gsub("Y", "", Img_DF$Y) %>% as.numeric()
   
   # Run clustering 
-  KCC <- kcca(Img_DF[,c("Red", "Green", "Blue")], k = k)
-  KCentroid <- Img_DF %>% mutate(Cluster = as.factor(KCC@cluster))
+  KMeans <- Img_DF %>% mutate(Cluster = as.factor(kmeans(Img_DF[,c("Red", "Green", "Blue")], centers = k)$cluster)) %>%
+    select(X, Y, Cluster) 
   
   # Shrink size
-  Smaller <- KCentroid %>%
+  Smaller <- KMeans %>%
     mutate(X = factor(X, levels = 1:max(X))) %>%
     pivot_wider(id_cols = Y, names_from = X, values_from = Cluster) %>%
     arrange(Y) %>%
@@ -65,9 +64,7 @@ apply_kcc <- function(in_path, k, out_path, blur) {
   colnames(Smaller) <- paste0("V", colnames(Smaller))
   
   # Write file
-  end_string <- strsplit(in_path, "/") %>% unlist() %>% tail(1) %>% gsub(pattern = ".png", replacement = "_KCC.txt", fixed = T)
+  end_string <- strsplit(in_path, "/") %>% unlist() %>% tail(1) %>% gsub(pattern = ".png", replacement = "_KMeans.txt", fixed = T)
   fwrite(Smaller, file.path(out_path, end_string), quote = F, row.names = F, sep = "\t")
   
 }
-
-
