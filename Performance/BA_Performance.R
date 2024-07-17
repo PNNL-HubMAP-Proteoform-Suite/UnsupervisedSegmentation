@@ -149,10 +149,6 @@ Stats_Table %>%
   cor(method = "pearson") %>%
   ggcorrplot(hc.order = TRUE, type = "full", lab = TRUE, legend.title = "Pearson\nCorrelation")
 
-
-
-
-
 PerformancePlot <- rbind(
   left_join(
     Stats_Table %>% filter(Cluster == 1) %>% select(Image, Method, BA),
@@ -173,9 +169,6 @@ PerformancePlot <- rbind(
     ylab("Balanced Accuracy") 
 
 PerformancePlot
-
-
-
 
 
 

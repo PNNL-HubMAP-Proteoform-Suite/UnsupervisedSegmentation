@@ -224,6 +224,34 @@ foreach(x = 1:nrow(Paths)) %dopar% {
 }
 stopCluster(cl)
 
+################################################################################
+### Full tissue-----------------------------------------------------------------
+################################################################################
+
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/kmeans.R")
+
+apply_kmeans(in_path = "~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/KPMP.png", k = 4, blur = FALSE,
+             out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/")
+
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/kcc.R")
+
+apply_kcc(in_path = "~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/KPMP.png", k = 4, blur = TRUE,
+             out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/")
+
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/clara.R")
+
+apply_clara(in_path = "~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/KPMP.png", k = 4, blur = FALSE,
+          out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/")
+
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/recolorize.R")
+
+apply_recolorize(in_path = "~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/KPMP.png", k = 4, blur = FALSE,
+            out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/")
+
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/supercells.R")
+
+apply_supercells(in_path = "~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/KPMP.png", k = 4, blur = FALSE,
+                 out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/")
 
 
 
