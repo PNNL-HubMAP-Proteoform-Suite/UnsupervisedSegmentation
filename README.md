@@ -2,7 +2,7 @@
 
 ### Description
 
-The goal of this work is to compare open-source unsupervised semantic segmentation algorithms for tissue feature unit identification in histology (H&E) images. Each algorithm had to have a way to set a number of clusters, and had to be semantic, which means groups like things as opposed to distinguishing them, which is instance segmentation. In this work, we also tested the effect of blurring images on the performance of segmentation algorithms.
+The goal of this work is to compare open-source unsupervised semantic segmentation algorithms for tissue feature unit identification in histology (H&E) images. Each algorithm had to have a way to set a number of clusters, and had to be semantic, which means it groups similar things together as opposed to distinguishing them, which is instance segmentation. In this work, we also tested the effect of blurring images on the performance of segmentation algorithms.
 
 ### Repo Structure 
 
