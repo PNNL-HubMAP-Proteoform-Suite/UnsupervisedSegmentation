@@ -30,7 +30,7 @@ The goal of this work is to compare open-source unsupervised semantic segmentati
 
 ### Images
 
-A trelliscope display of the blur and full studies can be found here: 
+A trelliscope display of the blur and full studies can be found [here](https://pnnl-hubmap-proteoform-suite.github.io/unsupervisedsegmentation.io/)
 
 ### Citation 
 
