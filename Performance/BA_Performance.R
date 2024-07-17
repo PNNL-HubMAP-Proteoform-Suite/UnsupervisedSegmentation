@@ -170,5 +170,23 @@ PerformancePlot <- rbind(
 
 PerformancePlot
 
+# Average time 
+algOrder <- c("clara", "K-Means", "recolorize", "supercells", "KCC", "pytorch-tip", "pyImSegm")
+data.table(
+  Algorithm = factor(algOrder, levels = algOrder),
+  `Average Time (seconds)` = c(4.5, 5.8, 15.3, 29.5, 92.3, 163.2, 319.3)
+) %>%
+  ggplot(aes(x = Algorithm, y = `Average Time (seconds)`)) +
+    geom_bar(stat = "identity") +
+    theme_bw() +
+    theme(axis.text.x = element_text(size = 12),
+          axis.text.y = element_text(size = 12),
+          axis.title.y = element_text(size = 16)) + 
+    xlab("")
+
+
+
+
+
 
 
