@@ -287,8 +287,9 @@ library(patchwork)
 library(cowplot)
 library(magick)
 
-draw_fun <- function(x, y, height = 0.95, size = 16) {ggdraw(clip = "on") + draw_image(x) + draw_label(y, y = height, size = size)}
+## Tiles ##
 
+draw_fun <- function(x, y, height = 0.95, size = 16) {ggdraw(clip = "on") + draw_image(x) + draw_label(y, y = height, size = size)}
 
 Ori <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Original/KPMP_uS-X002Y010.png", "Original Image", 0.98, 12)
 Target <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_PNG/KPMP_uS-X002Y010_Annotations.png", "Target")
@@ -303,4 +304,33 @@ PyTorch <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Py
 F2 <- Ori + Target + KCC_Blur + Recolorize + KMeans + Supercells + PyImSeg + Clara + PyTorch + plot_annotation(tag_levels = "A")
 
 F2
+
+## Full Tissue ## 
+
+# Go through each one at a time and match cluster numbers
+Full_Meta <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/KPMP.csv")
+data <- fread("~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/Supercells.txt")
+
+plot <- render_cluster(data,
+                       unlist(Full_Meta[, Color]),
+                       unlist(Full_Meta[, Supercells]))
+plot
+ggsave("~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/Supercells.png", units = "px", height = nrow(data), width = ncol(data),
+       plot = plot)
+
+
+draw_fun <- function(x, y, height = 0.95, size = 16) {ggdraw(clip = "on") + draw_image(x) + draw_label(y, y = height, size = size)}
+Ori <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/KPMP.png", "Original Image", height = 0.98)
+Clara <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/Clara.png", "Clara")
+KCC_Blur <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/KCC_Blur.png", "KCC with Blur")
+KCC <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/KCC.png", "KCC")
+KMeans <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/KMeans.png", "KMeans")
+PyImSeg <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/PyImSeg.png", "PyImSeg")
+PyTorch <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/PyTorch.png", "PyTorch")
+Recolorize <-  draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/Recolorize.png", "Recolorize")
+Supercells <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/Supercells.png", "Supercells")
+
+F4 <- Ori + Clara + KCC_Blur + KCC + KMeans + PyImSeg + PyTorch + Recolorize + Supercells + plot_annotation(tag_levels = "A")
+F4
+
 
