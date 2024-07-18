@@ -16,6 +16,7 @@ The goal of this work is to compare open-source unsupervised semantic segmentati
 |Algorithms/ | pytorch.py | The implementation of the pytorch method from [here](https://github.com/kanezaki/pytorch-unsupervised-segmentation-tip/tree/master) |
 |Algorithms/ | recolorize.R | The recolorize method from the recolorize package expanded to produce a set number of clusters |
 |Algorithms/ | supercells.R | An implementation of the SLIC Superpixel method from the supercells package |
+|Algorithms/ | Dimension_Reduction/ | Contains the R scripts with dimension reduction methods paired with clustering algorithms |
 |Data_Processing/ | -- | Contains all scripts to process images |
 |Data_Processing/ | Run_R_Algorithms.R | Script to run the R functions in the Algorithms folder |
 |Data_Processing/ | SVG_to_CSV.R | Converts QuPath SVG annotations to CSV, with a cluster assigned to each pixel |
@@ -24,8 +25,9 @@ The goal of this work is to compare open-source unsupervised semantic segmentati
 |Performance/ | -- | Contains code and results from balanced accuracy calculations |
 |Performance/ | BA_Performance.R | Takes the files with counts of positives and negatives and calculate balanced accuracy |
 |Performance/ | Blur_Counts/ | Contains the the positive and negative counts for the blur study |
+|Performance/ | DR_Counts/ | Contains the the positive and negative counts for the dimension reduction study |
 |Performance/ | Full_Counts/ | Contains the positive and negative counts for the full study |
-|Performance/ | Truth_Counts/ | Generates the count files with the number of true positives, true negatives, false positives, and false negatives using the predicted and manual annotations of clusters |
+|Performance/ | Truth_Counts.R | Generates the count files with the number of true positives, true negatives, false positives, and false negatives using the predicted and manual annotations of clusters |
 |Visualization/ | -- | Contains a function to convert the segmentation mask txt files to images in png format |
 
 ### Images
