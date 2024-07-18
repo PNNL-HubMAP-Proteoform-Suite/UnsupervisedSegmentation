@@ -2,7 +2,9 @@
 library(tidyverse)
 library(data.table)
 
-Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv")
+## Load the correct metadata file
+#Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv")
+Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Dimension_Reduction.csv")
 
 #' @param truth A data.frame with cluster values per height (rows) and width (columns) 
 #'     for the truth data 
@@ -83,6 +85,17 @@ calc_wrapper <- function(image_num, subfolder, tag, column_name) {
   })) %>% return()
   
 }
+
+#########################
+## DIMENSION REDUCTION ##
+#########################
+
+PCA_KCC <- calc_wrapper(1:10, "Kidney_Tiles/PCA_KCC_TXT", "_PCA_KCC.txt", "KCC.PCA")
+fwrite(PCA_KCC, "~/Git_Repos/UnsupervisedSegmentation/Performance/DR_Counts/PCA_KCC_Counts.csv")
+tSNE_KCC <- calc_wrapper(1:10, "Kidney_Tiles/tSNE_KCC_TXT", "_tSNE_KCC.txt", "KCC.tSNE")
+fwrite(tSNE_KCC, "~/Git_Repos/UnsupervisedSegmentation/Performance/DR_Counts/tSNE_KCC_Counts.csv")
+SVD_KCC <- calc_wrapper(1:10, "Kidney_Tiles/SVD_KCC_TXT", "_SVD_KCC.txt", "KCC.SVD")
+fwrite(SVD_KCC, "~/Git_Repos/UnsupervisedSegmentation/Performance/DR_Counts/SVD_KCC_Counts.csv")
 
 ##########
 ## BLUR ##
