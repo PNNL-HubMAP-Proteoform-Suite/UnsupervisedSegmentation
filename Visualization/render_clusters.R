@@ -27,7 +27,7 @@ render_cluster <- function(data, colors, order) {
 #########################
 
 DimMeta <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Dimension_Reduction.csv")
-subtile <- 2
+subtile <- 8
 root <- unique(DimMet$Path)[subtile]
 
 PCA <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/PCA_KCC_TXT", gsub(pattern = "Annotations", replacement = "PCA_KCC.txt", root)))
