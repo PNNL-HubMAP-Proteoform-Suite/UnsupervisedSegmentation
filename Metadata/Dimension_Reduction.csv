@@ -31,10 +31,10 @@ Subtile,Path,ManualClusterNumber,Color,KCC,KCC.PCA,KCC.tSNE,KCC.SVD
 8,KPMP_uS-X002Y019_Annotations,3,purple,4,2,3,1
 8,KPMP_uS-X002Y019_Annotations,4,yellow,2,4,2,4
 9,KPMP_uS-X002Y021_Annotations,1,white,3,3,3,1
-9,KPMP_uS-X002Y021_Annotations,2,blue,4,5,2,6
+9,KPMP_uS-X002Y021_Annotations,2,blue,4,5,2,4
 9,KPMP_uS-X002Y021_Annotations,3,black,2,4,4,3
 9,KPMP_uS-X002Y021_Annotations,4,gray,5,1,1,5
-9,KPMP_uS-X002Y021_Annotations,5,purple,1,2,6,4
+9,KPMP_uS-X002Y021_Annotations,5,purple,1,2,6,6
 9,KPMP_uS-X002Y021_Annotations,6,yellow,6,6,5,2
 10,KPMP_uS-X003Y006_Annotations,1,white,3,2,2,1
 10,KPMP_uS-X003Y006_Annotations,2,green,1,3,3,2
