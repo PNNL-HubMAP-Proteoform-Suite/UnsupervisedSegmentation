@@ -20,7 +20,38 @@ render_cluster <- function(data, colors, order) {
   
 }
 
-## Clusters need to be matched manually. Matches are tracked in the Annotation Summary csv
+## Clusters need to be matched manually. Matches are tracked in the Metadata csv
+
+#########################
+## DIMENSION REDUCTION ##
+#########################
+
+DimMeta <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Dimension_Reduction.csv")
+subtile <- 2
+root <- unique(DimMet$Path)[subtile]
+
+PCA <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/PCA_KCC_TXT", gsub(pattern = "Annotations", replacement = "PCA_KCC.txt", root)))
+PCAplot <- render_cluster(PCA, unlist(DimMeta[DimMeta$Path == root, Color]), unlist(DimMeta[DimMeta$Path == root, KCC.PCA]))
+PCAplot 
+ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/PCA_KCC_PNG", gsub("_Annotations", "_PCA_KCC.png", root)), plot = PCAplot, units = "px", height = nrow(PCA), width = ncol(PCA))
+
+
+DimMeta <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Dimension_Reduction.csv")
+tSNE <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/tSNE_KCC_TXT/", gsub(pattern = "Annotations", replacement = "tSNE_KCC.txt", root)))
+tSNEplot <- render_cluster(tSNE, unlist(DimMeta[DimMeta$Path == root, Color]), unlist(DimMeta[DimMeta$Path == root, KCC.tSNE]))
+tSNEplot 
+ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/tSNE_KCC_PNG", gsub("_Annotations", "_tSNE_KCC.png", root)), plot = tSNEplot, units = "px", height = nrow(tSNE), width = ncol(tSNE))
+
+
+DimMeta <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Dimension_Reduction.csv")
+SVD <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/SVD_KCC_TXT", gsub(pattern = "Annotations", replacement = "SVD_KCC.txt", root)))
+SVDplot <- render_cluster(SVD, unlist(DimMeta[DimMeta$Path == root, Color]), unlist(DimMeta[DimMeta$Path == root, KCC.SVD]))
+SVDplot 
+ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/SVD_KCC_PNG", gsub("_Annotations", "_SVD_KCC.png", root)), plot = SVDplot, units = "px", height = nrow(SVD), width = ncol(SVD))
+
+#####################
+## BLUR/FULL STUDY ##
+#####################
 
 # KMeans------------------------------------------------------------------------
 
@@ -297,9 +328,9 @@ Recolorize <-  draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tile
 KCC_Blur <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KCC_Blur_PNG/KPMP_uS-X002Y010_KCC.png", "KCC with Blur")
 KMeans <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMeans_PNG/KPMP_uS-X002Y010_KMeans.png", "KMeans")
 Supercells <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Supercells_PNG/KPMP_uS-X002Y010_supercells.png", "Supercells")
-PyImSeg <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/pyImSeg_PNG/KPMP_uS-X002Y010.png", "PyImSeg")
+PyImSeg <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/pyImSeg_PNG/KPMP_uS-X002Y010.png", "pyImSegm")
 Clara <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Clara_PNG/KPMP_uS-X002Y010_Clara.png", "Clara")
-PyTorch <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/PyTorch_PNG/KPMP_uS-X002Y010.png", "PyTorch")
+PyTorch <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/PyTorch_PNG/KPMP_uS-X002Y010.png", "pytorch-tip")
 
 F2 <- Ori + Target + KCC_Blur + Recolorize + KMeans + Supercells + PyImSeg + Clara + PyTorch + plot_annotation(tag_levels = "A")
 

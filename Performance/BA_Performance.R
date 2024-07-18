@@ -36,10 +36,10 @@ BA <- rbind(
   Scell_Blur %>% mutate(Algorithm = "Supercells", Format = "Blur"),
   Re %>% mutate(Algorithm = "Recolorize", Format = "Original"),
   Re_Blur %>% mutate(Algorithm = "Recolorize", Format = "Blur"),
-  PT %>% mutate(Algorithm = "PyTorch-Tip", Format = "Original"),
-  PT_Blur %>% mutate(Algorithm = "PyTorch-Tip", Format = "Blur"),
-  PY %>% mutate(Algorithm = "PyImSeg", Format = "Original"),
-  PY_Blur %>% mutate(Algorithm = "PyImSeg", Format = "Blur")
+  PT %>% mutate(Algorithm = "pytorch-tip", Format = "Original"),
+  PT_Blur %>% mutate(Algorithm = "pytorch-tip", Format = "Blur"),
+  PY %>% mutate(Algorithm = "pyImSegm", Format = "Original"),
+  PY_Blur %>% mutate(Algorithm = "pyImSegm", Format = "Blur")
 ) %>%
   pivot_wider(id_cols = c(Cluster, Image, Algorithm, Format), names_from = Counts, values_from = Freq) %>%
   mutate(
@@ -61,7 +61,10 @@ BA %>% select(Cluster, Algorithm, Format, BA) %>%
     geom_signif(xmin = 2.8, xmax = 3.2, y_position = 1.01, annotation = "***") +
     theme_bw() +
     ylim(c(0,1.05)) + 
-    ylab("Balanced Accuracy") 
+    ylab("Balanced Accuracy") +
+    xlab("") +
+    theme(axis.text.x = element_text(size = 10), axis.text.y = element_text(size = 10),
+        axis.title.y = element_text(size = 14))
 
 # Calculate paired t-tests
 BA %>%
@@ -125,7 +128,7 @@ Stats_Table %>%
 Overview_Plot <- Stats_Table %>%
   mutate(Method = factor(Method, levels = c("Recolorize", "KCC with Blur", "KMeans", 
                                             "Supercells", "PyImSeg", "Clara", "PyTorch"))) %>%
-    ggplot(aes(x = Method, y = BA, fill = Method)) + 
+    ggplot(aes(x = Method, y = BA)) + 
     geom_boxplot() +
     geom_signif(comparisons = list(c("Clara", "KCC with Blur"), c("Clara", "Recolorize"),
                                    c("PyTorch", "KCC with Blur"), c("PyTorch", "Recolorize")),
@@ -135,8 +138,8 @@ Overview_Plot <- Stats_Table %>%
     theme(legend.position = "none") +
     ylab("Balanced Accuracy") + 
     xlab("") + 
-    theme(axis.text.x = element_text(size = 14), axis.text.y = element_text(size = 14),
-          axis.title.y = element_text(size = 18))
+    theme(axis.text.x = element_text(size = 12), axis.text.y = element_text(size = 12),
+          axis.title.y = element_text(size = 16))
 
 Overview_Plot
 
@@ -171,10 +174,10 @@ PerformancePlot <- rbind(
 PerformancePlot
 
 # Average time 
-algOrder <- c("clara", "K-Means", "recolorize", "supercells", "KCC", "pytorch-tip", "pyImSegm")
+algOrder <- c("clara", "K-Means", "recolorize", "pyImSegm", "pytorch-tip", "supercells", "KCC\nwith blur")
 data.table(
   Algorithm = factor(algOrder, levels = algOrder),
-  `Average Time (seconds)` = c(4.5, 5.8, 15.3, 29.5, 92.3, 163.2, 319.3)
+  `Average Time (seconds)` = c(4.5, 5.8, 15.3, 15.8, 20.2, 29.5, 92.3)
 ) %>%
   ggplot(aes(x = Algorithm, y = `Average Time (seconds)`)) +
     geom_bar(stat = "identity") +

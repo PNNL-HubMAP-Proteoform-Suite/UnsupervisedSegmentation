@@ -18,6 +18,57 @@ Image_Paths <- Image_Metadata %>%
   )
 
 ################################################################################
+### Dimension Reduction Study---------------------------------------------------
+################################################################################
+
+# Subset down to blur images
+targets <- Image_Metadata %>% filter(Blur == "X") %>% select(Path) %>% unique() %>% unlist() 
+DRMeta <- Image_Metadata %>% filter(Path %in% targets)
+DRPaths <- DRMeta %>%
+  select(Path, ManualClusterNumber) %>%
+  group_by(Path) %>%
+  summarize(ClusterNum = n()) %>%
+  ungroup() %>%
+  mutate(
+    Path = paste0("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Original/", Path, ".png"),
+    Path = gsub("_Annotations", "", Path)
+  ) 
+
+## PCA + KCC ##
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/Dimension_Reduction/pca_kcc.R")
+
+lapply(1:10, function(x) {
+  apply_pca_kcc(
+    in_path = DRPaths$Path[x],
+    k = DRPaths$ClusterNum[x],
+    out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/PCA_KCC_TXT/"
+  )
+})
+
+## tSNE + KCC ## 
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/Dimension_Reduction/tsne_kcc.R")
+
+lapply(1:10, function(x) {
+  apply_tsne_kcc(
+    in_path = DRPaths$Path[x],
+    k = DRPaths$ClusterNum[x],
+    out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/tSNE_KCC_TXT/"
+  )
+})
+
+## SVD + KCC ## 
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/Dimension_Reduction/svd_kcc.R")
+
+lapply(1:10, function(x) {
+  apply_svd_kcc(
+    in_path = DRPaths$Path[x],
+    k = DRPaths$ClusterNum[x],
+    out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/SVD_KCC_TXT/"
+  )
+})
+
+
+################################################################################
 ### Blurring Study--------------------------------------------------------------
 ################################################################################
 
