@@ -12,8 +12,8 @@ The goal of this work is to compare open-source unsupervised semantic segmentati
 |Algorithms/ | clara.R | The "Clustering Large Applications" method from the cluster package |
 |Algorithms/ | kcc.R | The "K-Centroids Cluster" Analysis method from the flexclust package |
 |Algorithms/ | kmeans.R | The K-Means clustering method from the stas package |
-|Algorithms/ | pyimseg.py | The pyimsegm method from [here](https://github.com/Borda/pyImSegm) | 
-|Algorithms/ | pytorch.py | The implementation of the pytorch method from [here](https://github.com/kanezaki/pytorch-unsupervised-segmentation-tip/tree/master) |
+|Algorithms/ | pyimsegm.py | The pyimsegm method from [here](https://github.com/Borda/pyImSegm) | 
+|Algorithms/ | pytorchtip.py | The implementation of the pytorch method from [here](https://github.com/kanezaki/pytorch-unsupervised-segmentation-tip/tree/master) |
 |Algorithms/ | recolorize.R | The recolorize method from the recolorize package expanded to produce a set number of clusters |
 |Algorithms/ | supercells.R | An implementation of the SLIC Superpixel method from the supercells package |
 |Algorithms/ | Dimension_Reduction/ | Contains the R scripts with dimension reduction methods paired with clustering algorithms |
