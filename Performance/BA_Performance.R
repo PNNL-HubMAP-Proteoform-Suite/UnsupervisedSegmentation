@@ -1,7 +1,50 @@
 library(tidyverse)
 library(data.table)
+library(patchwork)
 library(ggsignif)
 library(ggcorrplot)
+
+#########################
+## DIMENSION REDUCTION ##
+#########################
+
+KCC <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/DR_Counts/KCC_Counts.csv") %>% mutate(Method = "KCC")
+PCA <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/DR_Counts/PCA_KCC_Counts.csv") %>% mutate(Method = "PCA & KCC")
+tSNE <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/DR_Counts/tSNE_KCC_Counts.csv") %>% mutate(Method = "tSNE & KCC")
+SVD <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/DR_Counts/SVD_KCC_Counts.csv") %>% mutate(Method = "SVD & KCC")
+
+# Calculate balanced accuracies  
+DR_Table <- rbind(KCC, PCA, tSNE, SVD) %>% 
+  pivot_wider(id_cols = c(Cluster, Image, Method), names_from = Counts, values_from = Freq) %>%
+  mutate(
+    BA = ((`True Positive` / (`True Positive` + `False Negative`)) + 
+            (`True Negative` / (`True Negative` + `False Positive`))) / 2,
+  )
+
+# Check assumptions of ANOVA
+Check <- DR_Table %>% 
+  select(Method, BA) %>%
+  filter(!is.na(BA)) %>%
+  group_by(Method) %>%
+  mutate(Residuals = BA - mean(BA))
+plot(qqnorm(Check$Residuals))
+qqline(Check$Residuals) # Normality assumption is ok
+ggplot(Check, aes(x = Method, y = Residuals)) + geom_boxplot() + theme_bw() # Equal variance is ok
+
+# Calculate an ANOVA and get the p-values for the multiple comparison adjustment 
+myanova <- lm(BA~Method, data = DR_Table)
+summary(myanova)
+
+DR_Plot <- ggplot(DR_Table, aes(x = Method, y = BA)) +
+  geom_boxplot() +
+  theme_bw() +
+  geom_signif(comparisons = list(c("KCC", "tSNE & KCC")), annotations = "***", textsize = 8) +
+  theme_bw() +
+  ylim(c(0,1.05)) + 
+  ylab("Balanced Accuracy") +
+  xlab("") +
+  theme(axis.text.x = element_text(size = 10), axis.text.y = element_text(size = 10),
+        axis.title.y = element_text(size = 14))
 
 #####################
 ## BLUR COMPARISON ##
@@ -27,7 +70,7 @@ PY_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Blur_Counts/P
 # Calculate balanced accuracy 
 BA <- rbind(
   KM %>% mutate(Algorithm = "K-Means", Format = "Original"),
-  KM_Blur %>% mutate(Algorithm = "K-Means", Format = "Blur"),
+  KM_Blur %>% mutate(Algorithm = "KMeans", Format = "Blur"),
   KCC %>% mutate(Algorithm = "KCC", Format = "Original"),
   KCC_Blur %>% mutate(Algorithm = "KCC", Format = "Blur"),
   Clara %>% mutate(Algorithm = "Clara", Format = "Original"),
@@ -53,7 +96,7 @@ BA <- rbind(
   
 
 # Make plots 
-BA %>% select(Cluster, Algorithm, Format, BA) %>%
+BA_Plot <- BA %>% select(Cluster, Algorithm, Format, BA) %>%
   mutate(Format = factor(Format, levels = c("Original", "Blur")),
          Cluster = as.factor(Cluster)) %>%
   ggplot(aes(x = Algorithm, y = BA, fill = Format)) +
@@ -81,6 +124,7 @@ BA %>%
   ) %>%
   select(Algorithm, TTest)
 
+DR_Plot + BA_Plot + plot_layout(widths = c(1,2)) + plot_annotation(tag_levels = "A")
 
 ###################
 ## FULL ANALYSIS ##
@@ -100,6 +144,9 @@ Stats_Table <- all_counts %>%
   mutate(
     BA = ((`True Positive` / (`True Positive` + `False Negative`)) + 
             (`True Negative` / (`True Negative` + `False Positive`))) / 2,
+  ) %>% mutate(
+    Method = ifelse(Method == "PyImSeg", "pyImSegm", Method), 
+    Method = ifelse(Method == "PyTorch", "pytorch-tip", Method)
   )
   
 # Make plots--------------------------------------------------------------------
@@ -127,30 +174,30 @@ Stats_Table %>%
 # Order plot 
 Overview_Plot <- Stats_Table %>%
   mutate(Method = factor(Method, levels = c("Recolorize", "KCC with Blur", "KMeans", 
-                                            "Supercells", "PyImSeg", "Clara", "PyTorch"))) %>%
+                                            "Supercells", "pyImSegm", "Clara", "pytorch-tip"))) %>%
     ggplot(aes(x = Method, y = BA)) + 
     geom_boxplot() +
     geom_signif(comparisons = list(c("Clara", "KCC with Blur"), c("Clara", "Recolorize"),
-                                   c("PyTorch", "KCC with Blur"), c("PyTorch", "Recolorize")),
-                annotations = "***", textsize = 8) +
+                                   c("pytorch-tip", "KCC with Blur"), c("pytorch-tip", "Recolorize")),
+                annotations = "*", textsize = 8) +
     theme_bw() +
+    theme(axis.text.x = element_text(size = 14, angle = 45, vjust = 1, hjust = 1)) +
     ylim(c(0, 1.1)) +
     theme(legend.position = "none") +
     ylab("Balanced Accuracy") + 
-    xlab("") + 
-    theme(axis.text.x = element_text(size = 12), axis.text.y = element_text(size = 12),
-          axis.title.y = element_text(size = 16))
+    xlab("")
 
 Overview_Plot
 
 # Make a correlation matrix
-Stats_Table %>%
+CorrPlot <- Stats_Table %>%
   select(Cluster, Image, Method, BA) %>%
   mutate(BA = ifelse(is.na(BA), 0, BA)) %>%
   pivot_wider(id_cols = c(Cluster, Image), names_from = Method, values_from = BA) %>%
   select(-c(Cluster, Image)) %>%
   cor(method = "pearson") %>%
   ggcorrplot(hc.order = TRUE, type = "full", lab = TRUE, legend.title = "Pearson\nCorrelation")
+CorrPlot
 
 PerformancePlot <- rbind(
   left_join(
@@ -174,19 +221,19 @@ PerformancePlot <- rbind(
 PerformancePlot
 
 # Average time 
-algOrder <- c("clara", "K-Means", "recolorize", "pyImSegm", "pytorch-tip", "supercells", "KCC\nwith blur")
-data.table(
+algOrder <- c("Clara", "KMeans", "Recolorize", "pyImSegm", "pytorch-tip", "Supercells", "KCC")
+SpeedPlot <- data.table(
   Algorithm = factor(algOrder, levels = algOrder),
   `Average Time (seconds)` = c(4.5, 5.8, 15.3, 15.8, 20.2, 29.5, 92.3)
 ) %>%
   ggplot(aes(x = Algorithm, y = `Average Time (seconds)`)) +
     geom_bar(stat = "identity") +
     theme_bw() +
-    theme(axis.text.x = element_text(size = 12),
-          axis.text.y = element_text(size = 12),
-          axis.title.y = element_text(size = 16)) + 
+   theme(axis.text.x = element_text(size = 14, angle = 45, vjust = 1, hjust = 1)) +
     xlab("")
+SpeedPlot
 
+(Overview_Plot + SpeedPlot + CorrPlot) / PerformancePlot + plot_annotation(tag_levels = "A")
 
 
 
