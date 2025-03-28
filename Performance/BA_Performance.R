@@ -3,6 +3,7 @@ library(data.table)
 library(patchwork)
 library(ggsignif)
 library(ggcorrplot)
+library(pheatmap)
 
 #########################
 ## DIMENSION REDUCTION ##
@@ -207,6 +208,16 @@ CorrPlot <- Stats_Table %>%
   cor(method = "spearman") %>%
   ggcorrplot(hc.order = TRUE, type = "full", lab = TRUE, legend.title = "Correlation")
 CorrPlot
+
+Stats_Table %>%
+  select(Cluster, Image, Method, BA) %>%
+  mutate(BA = ifelse(is.na(BA), 0, BA)) %>%
+  pivot_wider(id_cols = c(Cluster, Image), names_from = Method, values_from = BA) %>%
+  select(-c(Cluster, Image)) %>%
+  cor(method = "spearman") %>%
+  pheatmap()
+
+
 
 PerformancePlot <- rbind(
   left_join(
