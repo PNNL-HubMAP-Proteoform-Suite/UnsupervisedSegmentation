@@ -29,8 +29,10 @@ def run_multi_otsu(in_path, k, out_path):
     # Determine regions
     regions = np.digitize(img_array, bins = thresholds)
 
-    # Write image as pandas data.frame
-    end_string = in_path.split("/")[-1].re(".png", "_multiotsu.txt")
-    pd.DataFrame(regions).to_csv(os.path.join(out_path, end_string), sep = "\t")
-    
+    # Since python starts counting from 0, add 1 to regions
+    regions = regions + 1
 
+    # Write image as pandas data.frame. Reverse image
+    end_string = in_path.split("/")[-1].replace(".png", "_multiotsu.txt")
+    pd.DataFrame(regions).iloc[::-1].reset_index(drop = True).to_csv(os.path.join(out_path, end_string), sep = "\t")
+    return None

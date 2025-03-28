@@ -310,6 +310,41 @@ lapply(target, function(subtile) {
 #  
 #})
 
+# MultiOtsu---------------------------------------------------------------------
+
+Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv")
+
+target <- 1:30
+lapply(target, function(subtile) {
+  root <- unique(Image_Metadata$Path)[subtile]
+  newroot <- gsub("_Annotations", "_multiotsu", root)
+  data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Multiotsu_TXT/", paste0(newroot, ".txt")))
+  plot <- render_cluster(
+    data,
+    unlist(Image_Metadata[Image_Metadata$Path == root, "Color"]),
+    unlist(Image_Metadata[Image_Metadata$Path == root, "MultiOtsu"])
+  )
+  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Multiotsu_PNG/", paste0(newroot, ".png")),  plot = plot,
+                   units = "px", height = nrow(data), width = ncol(data))
+})
+
+# Binning-----------------------------------------------------------------------
+  
+Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv")
+target <- 1:30
+lapply(target, function(subtile) {
+  root <- unique(Image_Metadata$Path)[subtile]
+  newroot <- gsub("_Annotations", "_binning", root)
+  data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Binning_TXT/", paste0(newroot, ".txt")))
+  plot <- render_cluster(
+    data,
+    unlist(Image_Metadata[Image_Metadata$Path == root, "Color"]),
+    unlist(Image_Metadata[Image_Metadata$Path == root, "Binning"])
+  )
+  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Binning_PNG/", paste0(newroot, ".png")),  plot = plot,
+         units = "px", height = nrow(data), width = ncol(data))
+})
+
 ##################
 ## PLOT FIGURES ##
 ##################
