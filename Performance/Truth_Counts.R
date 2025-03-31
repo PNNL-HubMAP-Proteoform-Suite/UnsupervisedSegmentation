@@ -3,8 +3,8 @@ library(tidyverse)
 library(data.table)
 
 ## Load the correct metadata file
-#Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv")
-Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Dimension_Reduction.csv")
+Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv")
+#Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Dimension_Reduction.csv")
 
 #' @param truth A data.frame with cluster values per height (rows) and width (columns) 
 #'     for the truth data 
@@ -12,7 +12,8 @@ Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Dimension_Reduc
 #'     for the predicted values. Must be oriented the same way as truth. 
 #' @param image The name of the image in the metadata file
 #' @param model The name of the model column in the metadata file 
-truth_counts <- function(truth, predicted, image, model) {
+#' @param rm_row Remove first row and column on predicted
+truth_counts <- function(truth, predicted, image, model, rm_row_col = FALSE) {
   
   # Pull the number of clusters
   NumClusters <- max(truth)
@@ -23,7 +24,12 @@ truth_counts <- function(truth, predicted, image, model) {
   names(ClusterConvert) <- SubMeta$ManualClusterNumber
   
   # Make function to pivot image data.frames
-  make_pivot <- function(df) {
+  make_pivot <- function(df, rm_step = FALSE) {
+    
+    if (rm_step) {
+      df <- df[2:nrow(df), 2:ncol(df)]
+    }
+    
     df %>%
       mutate(Height = 1:nrow(.)) %>%
       pivot_longer(cols = 1:(ncol(.)-1)) %>%
@@ -34,7 +40,7 @@ truth_counts <- function(truth, predicted, image, model) {
   # Merge data.frames for counts 
   toCalc <- left_join(
     make_pivot(truth) %>% rename(TrueCluster = Cluster),
-    make_pivot(predicted) %>% mutate(Cluster = map_int(Cluster, function(x) {ClusterConvert[[x]]})) %>% rename(PredictedCluster = Cluster),
+    make_pivot(predicted, rm_row_col) %>% mutate(Cluster = map_int(Cluster, function(x) {ClusterConvert[[x]]})) %>% rename(PredictedCluster = Cluster),
     by = c("Height", "Width")
   )
   
@@ -65,7 +71,8 @@ truth_counts <- function(truth, predicted, image, model) {
 #' @param subfolder The folder with the text files
 #' @param tag Image tag name
 #' @param column_name Name of the colum in the metadata file with the cluster designations
-calc_wrapper <- function(image_num, subfolder, tag, column_name) {
+#' @param rm_row Remove first row and column on predicted
+calc_wrapper <- function(image_num, subfolder, tag, column_name, rm_row_col) {
   
   do.call(rbind, lapply(image_num, function(tile) {
     
@@ -80,7 +87,7 @@ calc_wrapper <- function(image_num, subfolder, tag, column_name) {
     predicted_path <- file.path("~/Git_Repos/UnsupervisedSegmentation/Images", subfolder, 
                                 paste0(gsub("_Annotations", "", tilename), tag))
     predicted <- fread(predicted_path)
-    truth_counts(truth, predicted, tilename, column_name)
+    truth_counts(truth, predicted, tilename, column_name, rm_row_col)
     
   })) %>% return()
   
@@ -193,9 +200,9 @@ fwrite(PyTorch_Blur_Counts, "~/Git_Repos/UnsupervisedSegmentation/Performance/Bl
 KMeans <- calc_wrapper(1:30, "Kidney_Tiles/KMeans_TXT", "_KMeans.txt", "Kmeans")
 fwrite(KMeans, "~/Git_Repos/UnsupervisedSegmentation/Performance/Full_Counts/KMeans_Counts.csv", quote = F, row.names = F)
 
-# KCC + Blur--------------------------------------------------------------------
-KCC_Blur <- calc_wrapper(1:30, "Kidney_Tiles/KCC_Blur_TXT", "_KCC.txt", "KCC.Blur")
-fwrite(KCC_Blur, "~/Git_Repos/UnsupervisedSegmentation/Performance/Full_Counts/KCC_Blur_Counts.csv", quote = F, row.names = F)
+# KCC---------------------------------------------------------------------------
+#KCC_Blur <- calc_wrapper(1:30, "Kidney_Tiles/KCC_Blur_TXT", "_KCC.txt", "KCC.Blur")
+#fwrite(KCC_Blur, "~/Git_Repos/UnsupervisedSegmentation/Performance/Full_Counts/KCC_Blur_Counts.csv", quote = F, row.names = F)
 
 # Clara-------------------------------------------------------------------------
 Clara <- calc_wrapper(1:30, "Kidney_Tiles/Clara_TXT", "_Clara.txt", "Clara")
@@ -216,6 +223,14 @@ fwrite(PyImSeg, "~/Git_Repos/UnsupervisedSegmentation/Performance/Full_Counts/Py
 # PyTorch-----------------------------------------------------------------------
 PyTorch <- calc_wrapper(1:30, "Kidney_Tiles/PyTorch_TXT", ".txt", "PyTorch")
 fwrite(PyTorch, "~/Git_Repos/UnsupervisedSegmentation/Performance/Full_Counts/PyTorch_Counts.csv", quote = F, row.names = F)
+
+# Multi-Otsu--------------------------------------------------------------------
+MultiOtsu <- calc_wrapper(1:30, "Kidney_Tiles/Multiotsu_TXT", "_multiotsu.txt", "MultiOtsu", TRUE)
+fwrite(MultiOtsu, "~/Git_Repos/UnsupervisedSegmentation/Performance/Full_Counts/MultiOtsu.csv", quote = F, row.names = F)
+
+# Binning-----------------------------------------------------------------------
+Binning <- calc_wrapper(1:30, "Kidney_Tiles/Binning_TXT", "_binning.txt", "Binning", TRUE)
+fwrite(Binning, "~/Git_Repos/UnsupervisedSegmentation/Performance/Full_Counts/Binning.csv", quote = F, row.names = F)
 
 
 

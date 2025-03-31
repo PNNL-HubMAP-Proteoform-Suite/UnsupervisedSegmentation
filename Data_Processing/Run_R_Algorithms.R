@@ -108,12 +108,23 @@ lapply(1:nrow(BlurPaths), function(x) {
 # Run unmodified and blurred images 
 source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/kcc.R")
 
-lapply(1:nrow(BlurPaths), function(x) {
+IM <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv") %>%
+  filter(Blur != "X") %>%
+  select(Path, ManualClusterNumber) %>%
+  group_by(Path) %>%
+  summarize(ClusterNum = n()) %>%
+  ungroup() %>%
+  mutate(
+    Path = paste0("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Original/", Path, ".png"),
+    Path = gsub("_Annotations", "", Path)
+  )
+
+lapply(1:nrow(IM), function(x) {
   apply_kcc(
-    in_path = BlurPaths$Path[x],
-    k = BlurPaths$ClusterNum[x],
-    out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KCC_Blur_TXT/", # update when blurred
-    blur = TRUE # Change to false when unblurred
+    in_path = IM$Path[x],
+    k = IM$ClusterNum[x],
+    out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KCC_TXT/", # update when blurred
+    blur = FALSE # Change to false when unblurred
   )
 })
 
