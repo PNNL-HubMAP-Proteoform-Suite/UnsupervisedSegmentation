@@ -100,7 +100,7 @@ Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_An
 
 new_targets <- Image_Metadata$Path %>% unique()
 
-lapply(new_targets, function(root) {
+lapply(new_targets[4], function(root) {
   
   data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KCC_TXT/", 
                           gsub(pattern = "Annotations", replacement = "KCC.txt", root)))
