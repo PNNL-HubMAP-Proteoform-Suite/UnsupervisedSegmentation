@@ -314,7 +314,7 @@ lapply(target, function(subtile) {
 
 Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv")
 
-target <- 1:30
+target <- 30
 lapply(target, function(subtile) {
   root <- unique(Image_Metadata$Path)[subtile]
   newroot <- gsub("_Annotations", "_multiotsu", root)
