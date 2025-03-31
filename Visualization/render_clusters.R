@@ -331,7 +331,7 @@ lapply(target, function(subtile) {
 # Binning-----------------------------------------------------------------------
   
 Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv")
-target <- 9
+target <- 30
 lapply(target, function(subtile) {
   root <- unique(Image_Metadata$Path)[subtile]
   newroot <- gsub("_Annotations", "_binning", root)
