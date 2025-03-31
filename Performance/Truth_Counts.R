@@ -72,7 +72,7 @@ truth_counts <- function(truth, predicted, image, model, rm_row_col = FALSE) {
 #' @param tag Image tag name
 #' @param column_name Name of the colum in the metadata file with the cluster designations
 #' @param rm_row Remove first row and column on predicted
-calc_wrapper <- function(image_num, subfolder, tag, column_name, rm_row_col) {
+calc_wrapper <- function(image_num, subfolder, tag, column_name, rm_row_col = FALSE) {
   
   do.call(rbind, lapply(image_num, function(tile) {
     
@@ -201,8 +201,8 @@ KMeans <- calc_wrapper(1:30, "Kidney_Tiles/KMeans_TXT", "_KMeans.txt", "Kmeans")
 fwrite(KMeans, "~/Git_Repos/UnsupervisedSegmentation/Performance/Full_Counts/KMeans_Counts.csv", quote = F, row.names = F)
 
 # KCC---------------------------------------------------------------------------
-#KCC_Blur <- calc_wrapper(1:30, "Kidney_Tiles/KCC_Blur_TXT", "_KCC.txt", "KCC.Blur")
-#fwrite(KCC_Blur, "~/Git_Repos/UnsupervisedSegmentation/Performance/Full_Counts/KCC_Blur_Counts.csv", quote = F, row.names = F)
+KCC <- calc_wrapper(1:30, "Kidney_Tiles/KCC_TXT", "_KCC.txt", "KCC")
+fwrite(KCC, "~/Git_Repos/UnsupervisedSegmentation/Performance/Full_Counts/KCC_Counts.csv", quote = F, row.names = F)
 
 # Clara-------------------------------------------------------------------------
 Clara <- calc_wrapper(1:30, "Kidney_Tiles/Clara_TXT", "_Clara.txt", "Clara")
