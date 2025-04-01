@@ -1,7 +1,7 @@
 library(data.table)
 library(tidyverse)
 
-render_cluster <- function(data, colors, order) {
+render_cluster <- function(data, colors, order, title) {
   
   colorList <- colors
   names(colorList) <- order
@@ -16,7 +16,8 @@ render_cluster <- function(data, colors, order) {
     geom_raster(interpolate = TRUE) +
     scale_fill_manual(values = colorList) +
     theme_void() +
-    theme(legend.position = "none")
+    ggtitle(title) + 
+    theme(legend.position = "none", plot.title = element_text(hjust = 0.5)) 
   
 }
 
@@ -358,17 +359,37 @@ library(magick)
 
 draw_fun <- function(x, y, height = 0.95, size = 16) {ggdraw(clip = "on") + draw_image(x) + draw_label(y, y = height, size = size)}
 
+# Pull the original plot
 Ori <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Original/KPMP_uS-X002Y010.png", "Original Image", 0.98, 12)
-Target <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_PNG/KPMP_uS-X002Y010_Annotations.png", "Target")
-Recolorize <-  draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Recolorize_PNG/KPMP_uS-X002Y010_recolorize.png", "recolorize")
-KCC_Blur <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KCC_Blur_PNG/KPMP_uS-X002Y010_KCC.png", "KCC with Blur")
-KMeans <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMeans_PNG/KPMP_uS-X002Y010_KMeans.png", "K-Means")
-Supercells <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Supercells_PNG/KPMP_uS-X002Y010_supercells.png", "supercells")
-PyImSeg <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/pyImSeg_PNG/KPMP_uS-X002Y010.png", "pyImSegm")
-Clara <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Clara_PNG/KPMP_uS-X002Y010_Clara.png", "clara")
-PyTorch <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/PyTorch_PNG/KPMP_uS-X002Y010.png", "pytorch-tip")
 
-F2 <- Ori + Target + KCC_Blur + Recolorize + KMeans + Supercells + PyImSeg + Clara + PyTorch + plot_annotation(tag_levels = "A")
+# Set colors
+colorPal <- c("white", "#0072B2", "orange")
+
+# Make target plot and others
+Target <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/KPMP_uS-X002Y010_Annotations.txt"), 
+               colorPal, c(1,2,3), "Target")
+Binning <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Binning_TXT/KPMP_uS-X002Y010_binning.txt"), 
+               colorPal, c(2,3,1), "Binning")
+Clara <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Clara_TXT/KPMP_uS-X002Y010_clara.txt"), 
+               colorPal, c(2,3,1), "Clara")
+KMeans <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMeans_TXT/KPMP_uS-X002Y010_KMeans.txt"),
+               colorPal, c(3,1,2), "K-Means")
+KCC <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KCC_TXT/KPMP_uS-X002Y010_KCC.txt"),
+               colorPal, c(2,3,1), "KCC")
+MO <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Multiotsu_TXT/KPMP_uS-X002Y010_multiotsu.txt"),
+               colorPal, c(2,3,1), "Multi-Otsu")
+ImSeg <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/pyImSeg_TXT/KPMP_uS-X002Y010.txt"),
+               colorPal, c(2,1,3), "pyImSegm")
+pytorch <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/PyTorch_TXT/KPMP_uS-X002Y010.txt"),
+               colorPal, c(3,1,2), "pytorch-tip")
+Recolorize <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Recolorize_TXT/KPMP_uS-X002Y010_recolorize.txt"),
+               colorPal, c(1,2,3), "Recolorize")
+Supercells <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Supercells_TXT/KPMP_uS-X002Y010_supercells.txt"),
+               colorPal, c(3,1,2), "Supercells")
+
+# Figure 2
+F2 <- Target + Binning + Clara + KMeans + KCC + MO + ImSeg + pytorch + Recolorize + Supercells +
+  plot_layout(nrow = 2, ncol = 5) + plot_annotation(tag_levels = "A")
 
 F2
 

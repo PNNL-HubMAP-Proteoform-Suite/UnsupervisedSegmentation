@@ -2,8 +2,7 @@ library(tidyverse)
 library(data.table)
 library(patchwork)
 library(ggsignif)
-library(ggcorrplot)
-library(pheatmap)
+library(ggdendro)
 
 #########################
 ## DIMENSION REDUCTION ##
@@ -46,8 +45,10 @@ DR_Plot <- ggplot(DR_Table, aes(x = Method, y = BA)) +
   ylim(c(0,1)) + 
   ylab("Balanced Accuracy") +
   xlab("") +
-  theme(axis.text.x = element_text(size = 12), axis.text.y = element_text(size = 14),
-        axis.title.y = element_text(size = 14))
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))#+
+  #theme(axis.text.x = element_text(size = 12), axis.text.y = element_text(size = 14),
+  #      axis.title.y = element_text(size = 14))
+DR_Plot
 
 #####################
 ## BLUR COMPARISON ##
@@ -107,9 +108,9 @@ BA_Plot <- BA %>% select(Cluster, Algorithm, Format, BA) %>%
     theme_bw() +
     ylim(c(0,1.05)) + 
     ylab("Balanced Accuracy") +
-    xlab("") +
-  theme(axis.text.x = element_text(size = 14), axis.text.y = element_text(size = 14),
-        axis.title.y = element_text(size = 14), legend.text = element_text(size = 14))
+    xlab("") #+
+  #theme(axis.text.x = element_text(size = 14), axis.text.y = element_text(size = 14),
+  #      axis.title.y = element_text(size = 14), legend.text = element_text(size = 14))
 
 # Calculate paired t-tests
 BA %>%
@@ -138,7 +139,9 @@ all_counts <- do.call(rbind, lapply(list.files("~/Git_Repos/UnsupervisedSegmenta
   data$Method <- strsplit(file, "/", fixed = T) %>% unlist() %>% tail(1) %>% gsub(pattern = "_Counts.csv", replacement = "")
   return(data)
 })) %>%
-  mutate(Method = ifelse(Method == "KCC_Blur", "KCC with Blur", Method))
+  filter(Method != "KCC_Blur") %>%
+  mutate(Method = ifelse(Method == "Binning.csv", "binning", Method),
+         Method = ifelse(Method == "MultiOtsu.csv", "Multi-Otsu", Method))
 
 # Calculate balanced accuracies  
 Stats_Table <- all_counts %>% 
@@ -183,15 +186,15 @@ Stats_Table %>%
 
 # Order plot 
 Overview_Plot <- Stats_Table %>%
-  mutate(Method = factor(Method, levels = c("recolorize", "KCC with Blur", "K-Means", 
-                                            "supercells", "pyImSegm", "clara", "pytorch-tip"))) %>%
+  mutate(Method = factor(Method, levels = c("recolorize", "binning", "K-Means", "pyImSegm",
+                                            "KCC", "supercells", "Multi-Otsu", "clara", "pytorch-tip"))) %>%
     ggplot(aes(x = Method, y = BA)) + 
     geom_boxplot() +
-    geom_signif(comparisons = list(c("clara", "KCC with Blur"), c("clara", "recolorize"),
-                                   c("pytorch-tip", "KCC with Blur"), c("pytorch-tip", "recolorize")),
+    geom_signif(comparisons = list(c("recolorize", "pytorch-tip"), c("recolorize", "clara"),
+                                   c("recolorize", "Multi-Otsu")),
                 annotations = "*", textsize = 8) +
     theme_bw() +
-    theme(axis.text.x = element_text(size = 14, angle = 45, vjust = 1, hjust = 1)) +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
     ylim(c(0, 1.1)) +
     theme(legend.position = "none") +
     ylab("Balanced Accuracy") + 
@@ -199,25 +202,18 @@ Overview_Plot <- Stats_Table %>%
 
 Overview_Plot
 
-# Make a correlation matrix
-CorrPlot <- Stats_Table %>%
+# Make a hierarchical cluster
+HcluPlot <- Stats_Table %>%
   select(Cluster, Image, Method, BA) %>%
   mutate(BA = ifelse(is.na(BA), 0, BA)) %>%
   pivot_wider(id_cols = c(Cluster, Image), names_from = Method, values_from = BA) %>%
   select(-c(Cluster, Image)) %>%
-  cor(method = "spearman") %>%
-  ggcorrplot(hc.order = TRUE, type = "full", lab = TRUE, legend.title = "Correlation")
-CorrPlot
-
-Stats_Table %>%
-  select(Cluster, Image, Method, BA) %>%
-  mutate(BA = ifelse(is.na(BA), 0, BA)) %>%
-  pivot_wider(id_cols = c(Cluster, Image), names_from = Method, values_from = BA) %>%
-  select(-c(Cluster, Image)) %>%
-  cor(method = "spearman") %>%
-  pheatmap()
-
-
+  t() %>%
+  dist() %>%
+  hclust() %>%
+  ggdendrogram(rotate = TRUE) +
+  theme(axis.text.x = element_blank())
+HcluPlot 
 
 PerformancePlot <- rbind(
   left_join(
@@ -241,19 +237,21 @@ PerformancePlot <- rbind(
 PerformancePlot
 
 # Average time 
-algOrder <- c("Clara", "KMeans", "Recolorize", "pyImSegm", "pytorch-tip", "Supercells", "KCC")
+algOrder <- c("binning", "Multi-Otsu", "clara", "K-Means", "recolorize", "pyImSegm", "pytorch-tip", "supercells", "KCC")
 SpeedPlot <- data.table(
   Algorithm = factor(algOrder, levels = algOrder),
-  `Average Time (seconds)` = c(4.5, 5.8, 15.3, 15.8, 20.2, 29.5, 92.3)
+  `Average Time (seconds)` = c(1.95, 2.5, 4.5, 5.8, 15.3, 15.8, 20.2, 29.5, 92.3)
 ) %>%
   ggplot(aes(x = Algorithm, y = `Average Time (seconds)`)) +
-    geom_bar(stat = "identity") +
+    geom_bar(stat = "identity", color = "black", fill = "steelblue") +
     theme_bw() +
-   theme(axis.text.x = element_text(size = 14, angle = 45, vjust = 1, hjust = 1)) +
+   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
     xlab("")
 SpeedPlot
 
-(Overview_Plot + SpeedPlot + CorrPlot) / PerformancePlot + plot_annotation(tag_levels = "A")
+# Figure 1
+(DR_Plot | Overview_Plot | SpeedPlot | HcluPlot) / PerformancePlot + 
+  plot_annotation(tag_levels = "A")
 
 
 
