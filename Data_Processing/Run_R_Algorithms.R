@@ -287,7 +287,7 @@ foreach(x = 1:nrow(Paths)) %dopar% {
 stopCluster(cl)
 
 ################################################################################
-### Full tissue-----------------------------------------------------------------
+### Full Tissue-----------------------------------------------------------------
 ################################################################################
 
 source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/kmeans.R")
@@ -315,9 +315,45 @@ source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/supercells.R")
 apply_supercells(in_path = "~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/KPMP.png", k = 4, blur = FALSE,
                  out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/")
 
+################################################################################
+### Root Images-----------------------------------------------------------------
+################################################################################
+
+root_images <- list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Original/", full.names = T)
+
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/clara.R")
+lapply(root_images, function(x) {
+  apply_clara(
+    in_path = x, k = 2, blur = FALSE, out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Root/Clara_TXT/"
+  )
+})
+
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/kcc.R")
+lapply(root_images, function(x) {
+  apply_kcc(
+    in_path = x, k = 2, blur = FALSE, out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Root/KCC_TXT/"
+  )
+})
 
 
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/kmeans.R")
+lapply(root_images, function(x) {
+  apply_kmeans(
+    in_path = x, k = 2, blur = FALSE, out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Root/KMeans_TXT/"
+  )
+})
 
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/recolorize.R")
+lapply(root_images, function(x) {
+  apply_recolorize(
+    in_path = x, k = 2, blur = FALSE, out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Root/Recolorize_TXT/"
+  )
+})
 
-
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/supercells.R")
+lapply(root_images, function(x) {
+  apply_supercells(
+    in_path = x, k = 2, blur = FALSE, out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Root/Supercells_TXT"
+  )
+})
 

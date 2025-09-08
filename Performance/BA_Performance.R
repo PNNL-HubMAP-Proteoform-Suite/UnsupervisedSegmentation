@@ -179,10 +179,11 @@ TukeyHSD(aov(BA~Method, data = Stats_Table))$Method %>%
   data.frame() %>%
   arrange(p.adj)
 
-Stats_Table %>%
+mymets <- Stats_Table %>%
   group_by(Method) %>%
   summarise(Mean = mean(BA), SD = sd(BA)) %>%
   arrange(-Mean)
+mymets
 
 # Order plot 
 Overview_Plot <- Stats_Table %>%
