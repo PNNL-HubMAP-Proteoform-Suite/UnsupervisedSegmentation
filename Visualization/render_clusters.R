@@ -13,11 +13,11 @@ render_cluster <- function(data, colors, order, title) {
     mutate(Width = gsub("V", "", Width) %>% as.numeric(),
            Cluster = as.factor(Cluster)) %>% 
     ggplot(aes(x = Width, y = Height, fill = Cluster)) +
-    geom_raster(interpolate = TRUE) +
-    scale_fill_manual(values = colorList) +
-    theme_void() +
-    ggtitle(title) + 
-    theme(legend.position = "none", plot.title = element_text(hjust = 0.5)) 
+      geom_raster(interpolate = TRUE) +
+      scale_fill_manual(values = colorList) +
+      theme_void() +
+      ggtitle(title) + 
+      theme(legend.position = "none", plot.title = element_text(hjust = 0.5)) 
   
 }
 
@@ -423,5 +423,155 @@ Supercells <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/Superce
 
 F4 <- Ori + Clara + KCC_Blur + KCC + KMeans + PyImSeg + PyTorch + Recolorize + Supercells + plot_annotation(tag_levels = "A")
 F4
+
+## Root-------------------------------------------------------------------------
+
+root_im <- fread("../Metadata/Root.csv")
+
+## Binning
+lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Binning_TXT", full.names = T), function(x) {
+  title <- x %>% strsplit("/") %>% unlist() %>% tail(1)
+  root <- gsub(pattern = "_binning.txt", replacement = "", title, fixed = T)
+  newroot <- title %>% gsub(pattern = ".txt", replacement = ".png", fixed = T)
+  data <- fread(x)
+  plot <- render_cluster(
+    data,
+    unlist(root_im[root_im$Image == root, "Color"]),
+    unlist(root_im[root_im$Image == root, "Binning"]),
+    "Binning"
+  )
+ ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Binning_PNG/", newroot),  plot = plot,
+        units = "px", height = nrow(data), width = ncol(data))
+})
+
+## Binning
+lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Binning_TXT", full.names = T), function(x) {
+  title <- x %>% strsplit("/") %>% unlist() %>% tail(1)
+  root <- gsub(pattern = "_binning.txt", replacement = "", title, fixed = T)
+  newroot <- title %>% gsub(pattern = ".txt", replacement = ".png", fixed = T)
+  data <- fread(x)
+  plot <- render_cluster(
+    data,
+    unlist(root_im[root_im$Image == root, "Color"]),
+    unlist(root_im[root_im$Image == root, "Binning"]),
+    "Binning"
+  )
+  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Binning_PNG/", newroot),  plot = plot,
+         units = "px", height = nrow(data), width = ncol(data))
+})
+
+## Clara
+lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Clara_TXT", full.names = T), function(x) {
+  title <- x %>% strsplit("/") %>% unlist() %>% tail(1)
+  root <- gsub(pattern = "_CLARA.txt", replacement = "", title, fixed = T)
+  newroot <- title %>% gsub(pattern = ".txt", replacement = ".png", fixed = T)
+  data <- fread(x)
+  plot <- render_cluster(
+    data,
+    unlist(root_im[root_im$Image == root, "Color"]),
+    unlist(root_im[root_im$Image == root, "Binning"]),
+    "Clara"
+  )
+  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Clara_PNG/", newroot),  plot = plot,
+         units = "px", height = nrow(data), width = ncol(data))
+})
+
+## KCC
+lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/KCC_TXT", full.names = T), function(x) {
+  title <- x %>% strsplit("/") %>% unlist() %>% tail(1)
+  root <- gsub(pattern = "_KCC.txt", replacement = "", title, fixed = T)
+  newroot <- title %>% gsub(pattern = ".txt", replacement = ".png", fixed = T)
+  data <- fread(x)
+  plot <- render_cluster(
+    data,
+    unlist(root_im[root_im$Image == root, "Color"]),
+    unlist(root_im[root_im$Image == root, "Binning"]),
+    "KCC"
+  )
+  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Root/KCC_PNG/", newroot),  plot = plot,
+         units = "px", height = nrow(data), width = ncol(data))
+})
+
+## KMeans
+lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/KMeans_TXT/", full.names = T), function(x) {
+  title <- x %>% strsplit("/") %>% unlist() %>% tail(1)
+  root <- gsub(pattern = "_KMeans.txt", replacement = "", title, fixed = T)
+  newroot <- title %>% gsub(pattern = ".txt", replacement = ".png", fixed = T)
+  data <- fread(x)
+  plot <- render_cluster(
+    data,
+    unlist(root_im[root_im$Image == root, "Color"]),
+    unlist(root_im[root_im$Image == root, "Binning"]),
+    "KMeans"
+  )
+  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Root/KMeans_PNG/", newroot),  plot = plot,
+         units = "px", height = nrow(data), width = ncol(data))
+})
+
+## Multi-Otsu
+lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Multiotsu_TXT/", full.names = T), function(x) {
+  title <- x %>% strsplit("/") %>% unlist() %>% tail(1)
+  root <- gsub(pattern = "_multiotsu.txt", replacement = "", title, fixed = T)
+  newroot <- title %>% gsub(pattern = ".txt", replacement = ".png", fixed = T)
+  data <- fread(x)
+  plot <- render_cluster(
+    data,
+    unlist(root_im[root_im$Image == root, "Color"]),
+    unlist(root_im[root_im$Image == root, "Binning"]),
+    "Multi-Otsu"
+  )
+  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Multiotsu_PNG/", newroot),  plot = plot,
+         units = "px", height = nrow(data), width = ncol(data))
+})
+
+## pytorch-tip
+lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/PyTorch_TXT/", full.names = T), function(x) {
+  title <- x %>% strsplit("/") %>% unlist() %>% tail(1)
+  root <- gsub(pattern = ".txt", replacement = "", title, fixed = T)
+  newroot <- title %>% gsub(pattern = ".txt", replacement = ".png", fixed = T)
+  data <- fread(x)
+  plot <- render_cluster(
+    data,
+    unlist(root_im[root_im$Image == root, "Color"]),
+    unlist(root_im[root_im$Image == root, "Binning"]),
+    "pytorch-tip"
+  )
+  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Root/PyTorch_PNG/", newroot),  plot = plot,
+         units = "px", height = nrow(data), width = ncol(data))
+})
+
+## Recolorize
+lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Recolorize_TXT/", full.names = T), function(x) {
+  title <- x %>% strsplit("/") %>% unlist() %>% tail(1)
+  root <- gsub(pattern = "_recolorize.txt", replacement = "", title, fixed = T)
+  newroot <- title %>% gsub(pattern = ".txt", replacement = ".png", fixed = T)
+  data <- fread(x)
+  plot <- render_cluster(
+    data,
+    unlist(root_im[root_im$Image == root, "Color"]),
+    unlist(root_im[root_im$Image == root, "Binning"]),
+    "Recolorize"
+  )
+  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Recolorize_PNG/", newroot),  plot = plot,
+         units = "px", height = nrow(data), width = ncol(data))
+})
+
+## Supercells
+lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Supercells_TXT/", full.names = T), function(x) {
+  title <- x %>% strsplit("/") %>% unlist() %>% tail(1)
+  root <- gsub(pattern = "_supercells.txt", replacement = "", title, fixed = T)
+  newroot <- title %>% gsub(pattern = ".txt", replacement = ".png", fixed = T)
+  data <- fread(x)
+  plot <- render_cluster(
+    data,
+    unlist(root_im[root_im$Image == root, "Color"]),
+    unlist(root_im[root_im$Image == root, "Binning"]),
+    "Supercells"
+  )
+  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Supercells_PNG/", newroot),  plot = plot,
+         units = "px", height = nrow(data), width = ncol(data))
+})
+
+
 
 
