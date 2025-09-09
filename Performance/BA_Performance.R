@@ -255,6 +255,52 @@ SpeedPlot
   plot_annotation(tag_levels = "A")
 
 
+# Calculate Root Statistics-----------------------------------------------------
+
+Root_Stats <- do.call(rbind, list.files("~/Git_Repos/UnsupervisedSegmentation/Performance/Root_Counts/", full.names = TRUE) %>%
+  lapply(function(x) {
+    data <- fread(x)
+    data$Algorithm <- strsplit(x, "/") %>% unlist() %>% tail(1) %>% gsub(pattern = "_Counts.csv", replacement = "")
+    return(data)
+  })
+) %>%
+  mutate(
+    Algorithm = tolower(Algorithm),
+    Algorithm = ifelse(Algorithm == "kcc", "KCC", Algorithm),
+    Algorithm = ifelse(Algorithm == "kmeans", "k-means", Algorithm),
+    Algorithm = ifelse(Algorithm == "multiotsu", "Multi-Otsu", Algorithm),
+    Algorithm = ifelse(Algorithm == "pytorch", "pytorch-tip", Algorithm)
+  ) %>%
+  pivot_wider(id_cols = c(Cluster, Image, Algorithm), names_from = Counts, values_from = Freq) %>%
+  mutate(
+    `True Positive` = ifelse(is.na(`True Positive`), 0, `True Positive`),
+    `True Negative` = ifelse(is.na(`True Negative`), 0, `True Negative`),
+    `False Negative` = ifelse(is.na(`False Negative`), 0, `False Negative`),
+    `False Positive` = ifelse(is.na(`False Positive`), 0, `False Positive`),
+    BA = ((`True Positive` / (`True Positive` + `False Negative`)) + 
+            (`True Negative` / (`True Negative` + `False Positive`))) / 2,
+  )
+
+pre_plot <- Root_Stats %>%
+  select(Algorithm, BA) %>%
+  group_by(Algorithm) %>%
+  mutate(Mean = mean(BA)) %>%
+  arrange(-Mean)
+
+pre_plot %>%
+  mutate(Algorithm = factor(Algorithm, levels = pre_plot$Algorithm %>% unique() %>% unlist())) %>%
+  ggplot(aes(x = Algorithm, y = BA)) +
+    geom_boxplot() +
+    theme_bw()
+
+
+
+
+
+
+
+
+
 
 
 
