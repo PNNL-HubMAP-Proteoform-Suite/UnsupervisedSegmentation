@@ -426,23 +426,7 @@ F4
 
 ## Root-------------------------------------------------------------------------
 
-root_im <- fread("../Metadata/Root.csv")
-
-## Binning
-lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Binning_TXT", full.names = T), function(x) {
-  title <- x %>% strsplit("/") %>% unlist() %>% tail(1)
-  root <- gsub(pattern = "_binning.txt", replacement = "", title, fixed = T)
-  newroot <- title %>% gsub(pattern = ".txt", replacement = ".png", fixed = T)
-  data <- fread(x)
-  plot <- render_cluster(
-    data,
-    unlist(root_im[root_im$Image == root, "Color"]),
-    unlist(root_im[root_im$Image == root, "Binning"]),
-    "Binning"
-  )
- ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Binning_PNG/", newroot),  plot = plot,
-        units = "px", height = nrow(data), width = ncol(data))
-})
+root_im <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Root.csv")
 
 ## Binning
 lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Binning_TXT", full.names = T), function(x) {
@@ -469,7 +453,7 @@ lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Clara_TXT", 
   plot <- render_cluster(
     data,
     unlist(root_im[root_im$Image == root, "Color"]),
-    unlist(root_im[root_im$Image == root, "Binning"]),
+    unlist(root_im[root_im$Image == root, "Clara"]),
     "Clara"
   )
   ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Clara_PNG/", newroot),  plot = plot,
@@ -485,7 +469,7 @@ lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/KCC_TXT", fu
   plot <- render_cluster(
     data,
     unlist(root_im[root_im$Image == root, "Color"]),
-    unlist(root_im[root_im$Image == root, "Binning"]),
+    unlist(root_im[root_im$Image == root, "KCC"]),
     "KCC"
   )
   ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Root/KCC_PNG/", newroot),  plot = plot,
@@ -501,7 +485,7 @@ lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/KMeans_TXT/"
   plot <- render_cluster(
     data,
     unlist(root_im[root_im$Image == root, "Color"]),
-    unlist(root_im[root_im$Image == root, "Binning"]),
+    unlist(root_im[root_im$Image == root, "Kmeans"]),
     "KMeans"
   )
   ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Root/KMeans_PNG/", newroot),  plot = plot,
@@ -517,7 +501,7 @@ lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Multiotsu_TX
   plot <- render_cluster(
     data,
     unlist(root_im[root_im$Image == root, "Color"]),
-    unlist(root_im[root_im$Image == root, "Binning"]),
+    unlist(root_im[root_im$Image == root, "Multiotsu"]),
     "Multi-Otsu"
   )
   ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Multiotsu_PNG/", newroot),  plot = plot,
@@ -533,7 +517,7 @@ lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/PyTorch_TXT/
   plot <- render_cluster(
     data,
     unlist(root_im[root_im$Image == root, "Color"]),
-    unlist(root_im[root_im$Image == root, "Binning"]),
+    unlist(root_im[root_im$Image == root, "Pytorch"]),
     "pytorch-tip"
   )
   ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Root/PyTorch_PNG/", newroot),  plot = plot,
@@ -549,7 +533,7 @@ lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Recolorize_T
   plot <- render_cluster(
     data,
     unlist(root_im[root_im$Image == root, "Color"]),
-    unlist(root_im[root_im$Image == root, "Binning"]),
+    unlist(root_im[root_im$Image == root, "Recolorize"]),
     "Recolorize"
   )
   ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Recolorize_PNG/", newroot),  plot = plot,
@@ -565,7 +549,7 @@ lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Supercells_T
   plot <- render_cluster(
     data,
     unlist(root_im[root_im$Image == root, "Color"]),
-    unlist(root_im[root_im$Image == root, "Binning"]),
+    unlist(root_im[root_im$Image == root, "Supercells"]),
     "Supercells"
   )
   ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Supercells_PNG/", newroot),  plot = plot,
