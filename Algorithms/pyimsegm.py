@@ -61,7 +61,7 @@ def seg(hist_img, clust_num, output):
     # reorder columns to x, y, cluster 
     df = df[['x_pos', 'y_pos', 'cluster']]
 
-    df.to_csv(output, sep=',', index=False) # file name can be changed as user sees fit
+    df.to_csv(output, sep='\t', index=False) # file name can be changed as user sees fit
 
 if __name__ == '__main__':
     freeze_support()
