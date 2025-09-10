@@ -388,8 +388,20 @@ for (pth in root_tiles) {
 }
 
 
+root2_feature <- data.frame(
+  symbol = "White",
+  red = 255,
+  green = 255, 
+  blue = 255,
+  thresh = 60
+)
+out <- SVG_to_CSV("Feature_Modified.png", root2_feature)
+plot <- make_plot(out, c("white", "black"))
 
 
+
+
+write.table(out, "Feature_annotated.txt", quote = F, row.names = F, sep = "\t")
 
 
 

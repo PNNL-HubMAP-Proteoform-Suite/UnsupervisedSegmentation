@@ -20,23 +20,13 @@ setwd("~/Git_Repos/UnsupervisedSegmentation/Spatial_Differential_Statistics/")
 msi <- readRDS("msi.RDS")
 edata <- msi[[1]] %>%
   pivot_longer(2:ncol(.)) 
-fdata <- msi[[2]] %>%
-  mutate( # Add X and Y information
-    X = map_dbl(Pixel, function(x) {
-      strsplit(x, "Y") %>% unlist() %>% head(1) %>% gsub("X", "", .) %>% as.numeric()
-    }),
-    Y = map_dbl(Pixel, function(x) {
-      strsplit(x, "Y") %>% unlist() %>% tail(1) %>% as.numeric()
-    }),
-    Y = Y * -1
-  )
+fdata <- msi[[2]]
 rm(msi)
 
 ## Ensure MSI and Feature Image are the Correct Orientations--------------------
 
 # Visualize feature image
 feature_img <- fdata %>%
-  select(Pixel, R, G, B) %>%
   mutate(
     Hexadecimal = lapply(1:nrow(.), function(row) {
       grDevices::rgb(.$R[row]/255, .$G[row]/255, .$B[row]/255)
@@ -96,7 +86,13 @@ cluster_visualize <- function(x, title) {
           plot.title = element_text(size = 20, hjust = 0.5))
 }
 
-fdata <- fdata %>% select(-Cluster)
+# fdata add annotations --> just once! 
+#fdata <- left_join(fdata, fread("Feature_annotated.txt") %>% 
+#                     rename(X = Width, Y = Height, Truth = Cluster) %>%
+#                     mutate(X = X - 1,
+#                            Y = -1 * (216-Y),
+#                            Truth = ifelse(Truth == 1, "Not Root", "Root")))
+manual_plot <- ggplot(fdata, aes(x = X, y = Y, fill = Truth)) %>% cluster_visualize(title = "Manual Segmentation")
 
 # For each method, cluster once and save results.
 
@@ -130,7 +126,7 @@ kmeans_plot <- ggplot(fdata, aes(x = X, y = Y, fill = KMeans)) %>% cluster_visua
 recolorize_plot <- ggplot(fdata, aes(x = X, y = Y, fill = Recolorize)) %>% 
   cluster_visualize(title = "recolorize")
 
-## Supercells ## --> can we fix supercells?
+## Supercells ##
 #source("../Algorithms/supercells_root.R")
 #apply_supercells("Feature.png", 2, ".", blur = FALSE)
 #fdata <- fdata %>% 
@@ -143,6 +139,43 @@ recolorize_plot <- ggplot(fdata, aes(x = X, y = Y, fill = Recolorize)) %>%
 #  ) %>%
 #  mutate(Supercells = ifelse(Supercells == 1, "Root", "Not Root"))  
 supercells_plot <- ggplot(fdata, aes(x = X, y = Y, fill = Supercells)) %>% cluster_visualize(title = "supercells")
+
+## Binning ## 
+fdata <- fdata %>% 
+  mutate(Binning = fread("Feature_binning.txt", header = T) %>%
+             mutate(Height = 1:nrow(.)) %>%
+             pivot_longer(cols = c(1:(ncol(.) - 1))) %>%
+             arrange(-Height) %>%
+             select(value) %>% 
+             unlist()
+  ) %>%
+  mutate(Binning = ifelse(Binning == 1, "Not Root", "Root")) 
+binning_plot <- ggplot(fdata, aes(x = X, y = Y, fill = Binning)) %>% cluster_visualize(title = "binning")
+
+## Multi-Otsu ##
+fdata <- fdata %>% 
+  mutate(MultiOtsu = fread("Feature_multiotsu.txt", header = T) %>%
+           mutate(Height = 1:nrow(.)) %>%
+           pivot_longer(cols = c(1:(ncol(.) - 1))) %>%
+           arrange(-Height) %>%
+           select(value) %>% 
+           unlist()
+  ) %>%
+  mutate(MultiOtsu = ifelse(MultiOtsu == 1, "Not Root", "Root"))
+multiotsu_plot <- ggplot(fdata, aes(x = X, y = Y, fill = MultiOtsu)) %>% cluster_visualize(title = "Multi-Otsu")
+
+## PyTorchTip ##
+fdata <- fdata %>% 
+  mutate(PyTorch = fread("Feature_PyTorch.txt", header = T) %>%
+           mutate(Height = 1:nrow(.)) %>%
+           pivot_longer(cols = c(1:(ncol(.) - 1))) %>%
+           arrange(-Height) %>%
+           select(value) %>% 
+           unlist()
+  ) %>%
+  mutate(PyTorch = ifelse(PyTorch == 6, "Not Root", "Root"))
+pytorch_plot <- ggplot(fdata, aes(x = X, y = Y, fill = PyTorch)) %>% cluster_visualize(title = "pytorch-tip")
+
 
 
 
