@@ -18,7 +18,6 @@ apply_supercells <- function(in_path, k, out_path, blur) {
   library(sf)
   library(terra)
   library(supercells)
-  library(recolorize)
   
   # If blur, make and read the blurred image 
   if (blur) {
@@ -41,28 +40,52 @@ apply_supercells <- function(in_path, k, out_path, blur) {
   
   # Make raster
   the_rast <- terra::rast(imgRead)
+  SCELLS <- supercells(the_rast, k = 100000, compactness = 1e-20)
   
-  # Run supercells and cluster
-  SCELLS <- supercells(the_rast, k = 1000, compactness = 1e-20) %>%
-    mutate(
-      Cluster = as.factor(kmeans(data.frame(lyr.1, lyr.2, lyr.3), centers = k)$cluster)
-    )
+  # Extract each region
+  coordinates <- do.call(rbind, st_geometry(SCELLS)) %>%
+    as_tibble() %>% 
+    rename(Coords = V1) %>%
+    mutate(Regions = 1:nrow(.)) %>%
+    select(Coords, Regions) %>%
+    group_by(Regions) %>%
+    unnest(cols = c(Coords)) 
+  coordinates <- data.frame(
+    X = coordinates$Coords[,1],
+    Y = coordinates$Coords[,2],
+    Regions = coordinates$Regions
+  ) %>%
+    mutate(X = ifelse(X == 0, 1, X), Y = ifelse(Y == 0, 1, Y))
   
-  # Make a plot object and save
-  png("temp_file.png", height = dim(imgRead)[1], width = dim(imgRead)[2], bg = "transparent")
-  par(mar = c(0, 0, 0, 0), oma = c(0, 0, 0, 0), xpd = NA)
-  plot(sf::st_geometry(SCELLS), col = SCELLS$Cluster, border = SCELLS$Cluster)
-  dev.off()
-
-  # Read in the plot object
-  imgRead <- readPNG("temp_file.png")
-  unlink("temp_file.png")
-  clusters <- recolorize::recolorize(imgRead, bins = k)$pixel_assignments
+  # Convert regions to groups
+  regions <- data.frame(Regions = unique(coordinates$Regions),
+                        Cluster = as.factor(kmeans(data.frame(SCELLS$lyr.1, SCELLS$lyr.2, SCELLS$lyr.3), centers = k)$cluster))
+  regions <- left_join(regions, coordinates)
+  
+  # Fill a matrix with edges
+  val_mat <- matrix(NA, ncol = max(coordinates$X), nrow = max(coordinates$Y))
+  colnames(val_mat) <- 1:max(coordinates$X)
+  row.names(val_mat) <- 1:max(coordinates$Y)
+  fast_fill <- lapply(1:nrow(regions), function(row) {
+    val_mat[regions$Y[row], regions$X[row]] <<- regions$Cluster[row]
+  })
+  rm(fast_fill)
+  
+  # Fill edges line by line 
+  fast_fill <- lapply(1:nrow(val_mat), function(theRow) {
+    closest = 1
+    lapply(1:ncol(val_mat), function(theCol) {
+      if (!is.na(val_mat[theRow, theCol])) {closest <<- val_mat[theRow, theCol]} else {
+        val_mat[theRow, theCol] <<- closest
+      }
+    })
+    return(NULL)
+  })
+  rm(fast_fill)
   
   # Make output matrix
-  Smaller <- clusters %>% data.frame()
+  Smaller <- val_mat %>% data.frame()
   colnames(Smaller) <- paste0("V", gsub("X", "", colnames(Smaller)))
-  Smaller <- Smaller[nrow(Smaller):1, ]
   
   # Write file
   end_string <- strsplit(in_path, "/") %>% unlist() %>% tail(1) %>% gsub(pattern = ".png", replacement = "_supercells.txt", fixed = T)

@@ -116,7 +116,7 @@ kcc_plot <- ggplot(fdata, aes(x = X, y = Y, fill = KCC)) %>% cluster_visualize(t
 kmeans_plot <- ggplot(fdata, aes(x = X, y = Y, fill = KMeans)) %>% cluster_visualize(title = "k-means")
 
 ## Recolorize ##
-#source("../Algorithms/recolorize.R")
+# source("../Algorithms/recolorize.R")
 #apply_recolorize("Feature.png", 2, ".", blur = FALSE)
 #fdata <- fdata %>% 
 #  mutate(Recolorize = fread("Feature_recolorize.txt") %>%
@@ -131,7 +131,7 @@ recolorize_plot <- ggplot(fdata, aes(x = X, y = Y, fill = Recolorize)) %>%
   cluster_visualize(title = "recolorize")
 
 ## Supercells ## --> can we fix supercells?
-#source("../Algorithms/supercells.R")
+#source("../Algorithms/supercells_root.R")
 #apply_supercells("Feature.png", 2, ".", blur = FALSE)
 #fdata <- fdata %>% 
 #  mutate(Supercells = fread("Feature_supercells.txt") %>%
