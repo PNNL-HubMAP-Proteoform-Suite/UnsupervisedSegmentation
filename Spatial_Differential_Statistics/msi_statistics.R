@@ -114,5 +114,70 @@ edata %>%
   select(-data) %>%
   fwrite("pvalues.csv", quote = F, row.names = F)
 
+## Visualize differences in pvalues---------------------------------------------
+
+pvals <- fread("pvalues.csv") %>%
+  mutate(
+    Algorithm = tolower(Algorithm),
+    Algorithm = ifelse(Algorithm == "truth", "Manual", Algorithm),
+    Algorithm = ifelse(Algorithm == "kmeans", "k-means", Algorithm),
+    Algorithm = ifelse(Algorithm == "kcc", "KCC", Algorithm),
+    Algorithm = ifelse(Algorithm == "multiotsu", "Multi-Otsu", Algorithm),
+    Algorithm = ifelse(Algorithm == "pytorch", "pytorch-tip", Algorithm)
+  ) %>%
+  mutate(Algorithm = factor(Algorithm, 
+    levels = c("Manual", "binning", "clara", "k-means", "KCC", "Multi-Otsu", 
+               "pytorch-tip", "recolorize", "supercells"))
+  )
+
+# Find all biomolecules significant in manual annotation
+biomolecules <- pvals %>% filter(Algorithm == "Manual" & PVal <= 0.05) %>% select(Biomolecule) %>% unlist()
+
+# Make a barplot of overlaps
+barplots <- pvals %>%
+  filter(!is.na(PVal)) %>%
+  mutate(`In Manual` = Biomolecule %in% biomolecules) %>%
+  filter(PVal <= 0.05) %>%
+  group_by(Algorithm) %>%
+  summarize(
+    Significant = n(),
+    `In Manual` = sum(`In Manual`),
+    `Not in Manual` = Significant - `In Manual`
+  ) %>% 
+  pivot_longer(3:4) %>%
+  rename(Type = name, Count = value) %>%
+  mutate(Proportion = Count / Significant,
+         Type = factor(Type, levels = c("Not in Manual", "In Manual")),
+         Count = ifelse(Count == 0, NA, Count)) %>%
+  ggplot(aes(x = Algorithm, fill = Type, y = Proportion)) +
+    geom_bar(stat = "identity", position = "stack") +
+    geom_text(aes(label = Count), 
+              position = position_stack(vjust = 0.5), 
+              color = "white",                     
+              size = 4) + 
+    scale_fill_manual(values = c("red", "black")) +
+    theme_bw() +
+    ggtitle("# of Significant Biomolecules") +
+    theme(plot.title = element_text(hjust = 0.5), legend.position = "bottom")
+
+# Make a boxplot of pvalue distributions 
+boxplots <- ggplot(pvals, aes(x = Algorithm, y = PVal, fill = Algorithm)) +
+  geom_boxplot() +
+  ylab("p-value") +
+  theme_bw() +
+  theme(legend.position = "none")
+
+pvals %>%
+  filter(!is.na(PVal) & PVal <= 0.05) %>% 
+  select(Biomolecule, Algorithm) %>%
+  mutate(Presence = "X") %>%
+  pivot_wider(id_cols = Biomolecule, values_from = Presence, names_from = Algorithm)
+
+
+
+barplots + boxplots
+
+
+
 
 
