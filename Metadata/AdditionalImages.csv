@@ -1,0 +1,8 @@
+﻿Image,ManualClusterNumber,Color,Binning,Clara,KCC,Kmeans,MultiOtsu,Pytorch,Recolorize,Supercells
+Leaf,1,black,1,1,3,1,1,1,1,3
+Leaf,2,darkgreen,2,2,1,2,2,2,2,2
+Leaf,3,goldenrod4,3,3,2,3,3,3,3,1
+Root,1,gray,1,2,4,4,1,1,3,1
+Root,2,blue,3,3,2,2,3,3,2,4
+Root,3,white,4,4,1,3,4,2,1,2
+Root,4,goldenrod4,2,1,3,1,2,4,4,3

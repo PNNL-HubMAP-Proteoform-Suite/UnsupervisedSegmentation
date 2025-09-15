@@ -43,7 +43,7 @@ apply_supercells <- function(in_path, k, out_path, blur) {
   the_rast <- terra::rast(imgRead)
   
   # Run supercells and cluster
-  SCELLS <- supercells(the_rast, k = 100000, compactness = 1e-20) %>%
+  SCELLS <- supercells(the_rast, k = 10000, compactness = 1e-20) %>%
     mutate(
       Cluster = as.factor(kmeans(data.frame(lyr.1, lyr.2, lyr.3), centers = k)$cluster)
     )
@@ -57,7 +57,7 @@ apply_supercells <- function(in_path, k, out_path, blur) {
   # Read in the plot object
   imgRead <- readPNG("temp_file.png")
   unlink("temp_file.png")
-  clusters <- recolorize::recolorize(imgRead, bins = k)$pixel_assignments
+  clusters <- recolorize::recolorize(imgRead, bins = k, method = "kmeans")$pixel_assignments
   
   # Make output matrix
   Smaller <- clusters %>% data.frame()

@@ -19,7 +19,7 @@ The goal of this work is to compare open-source unsupervised semantic segmentati
 |Algorithms/ | supercells.R | An implementation of the SLIC Superpixel method from the supercells package |
 |Algorithms/ | Dimension_Reduction/ | Contains the R scripts with dimension reduction methods paired with clustering algorithms |
 |Data_Processing/ | -- | Contains all scripts to process images |
-|Data_Processing/ | Run_Python_Algorithms.ipynb | Run binning and multi-otsu |
+|Data_Processing/ | Run_Python_Algorithms.ipynb | Run binning, multiotsu, and pytorchtip |
 |Data_Processing/ | Run_R_Algorithms.R | Script to run the R functions in the Algorithms folder |
 |Data_Processing/ | SVG_to_CSV.R | Converts QuPath SVG annotations to CSV, with a cluster assigned to each pixel |
 |Figures/ | -- | Contains figures and tables |

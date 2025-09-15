@@ -556,6 +556,38 @@ lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Supercells_T
          units = "px", height = nrow(data), width = ncol(data))
 })
 
+## Additional Images------------------------------------------------------------
+
+# Leaf
+setwd("~/Git_Repos/UnsupervisedSegmentation/Images/Leaf/")
+
+meta <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/AdditionalImages.csv")
+(ggdraw() + draw_image("../../Data_Processing/AdditionalExamples/Leaf.png", width = 1, height = 0.9) + draw_label("Original", y = 0.95, size = 14)) +
+  render_cluster(fread("Leaf_binning.txt"), unlist(meta[meta$Image == "Leaf", "Color"]), unlist(meta[meta$Image == "Leaf", "Binning"]), "binning") + 
+  render_cluster(fread("Leaf_CLARA.txt"), unlist(meta[meta$Image == "Leaf", "Color"]), unlist(meta[meta$Image == "Leaf", "Clara"]), "clara") +
+  render_cluster(fread("Leaf_KCC.txt"), unlist(meta[meta$Image == "Leaf", "Color"]), unlist(meta[meta$Image == "Leaf", "KCC"]), "kcc") +
+  render_cluster(fread("Leaf_KMeans.txt"), unlist(meta[meta$Image == "Leaf", "Color"]), unlist(meta[meta$Image == "Leaf", "Kmeans"]), "k-means") + 
+  render_cluster(fread("Leaf_multiotsu.txt"), unlist(meta[meta$Image == "Leaf", "Color"]), unlist(meta[meta$Image == "Leaf", "MultiOtsu"]), "Multi-Otsu") +
+  render_cluster(fread("Leaf_PyTorch.txt"), unlist(meta[meta$Image == "Leaf", "Color"]), unlist(meta[meta$Image == "Leaf", "Pytorch"]), "pytorch-tip") +
+  render_cluster(fread("Leaf_recolorize.txt"), unlist(meta[meta$Image == "Leaf", "Color"]), unlist(meta[meta$Image == "Leaf", "Recolorize"]), "recolorize") +
+  render_cluster(fread("Leaf_supercells.txt"), unlist(meta[meta$Image == "Leaf", "Color"]), unlist(meta[meta$Image == "Leaf", "Supercells"]), "supercells") +
+  plot_annotation(tag_levels = "A")
+
+# Root
+setwd("~/Git_Repos/UnsupervisedSegmentation/Images/RootCrossSection/")
+
+meta <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/AdditionalImages.csv")
+(ggdraw() + draw_image("../../Data_Processing/AdditionalExamples/RootCrossSection.png", width = 1, height = 0.9) + draw_label("Original", y = 0.95, size = 14)) +
+  render_cluster(fread("RootCrossSection_binning.txt"), unlist(meta[meta$Image == "Root", "Color"]), unlist(meta[meta$Image == "Root", "Binning"]), "binning") + 
+  render_cluster(fread("RootCrossSection_CLARA.txt"), unlist(meta[meta$Image == "Root", "Color"]), unlist(meta[meta$Image == "Root", "Clara"]), "clara") +
+  render_cluster(fread("RootCrossSection_KCC.txt"), unlist(meta[meta$Image == "Root", "Color"]), unlist(meta[meta$Image == "Root", "KCC"]), "kcc") +
+  render_cluster(fread("RootCrossSection_KMeans.txt"), unlist(meta[meta$Image == "Root", "Color"]), unlist(meta[meta$Image == "Root", "Kmeans"]), "k-means") + 
+  render_cluster(fread("RootCrossSection_multiotsu.txt"), unlist(meta[meta$Image == "Root", "Color"]), unlist(meta[meta$Image == "Root", "MultiOtsu"]), "Multi-Otsu") +
+  render_cluster(fread("RootCrossSection_PyTorch.txt"), unlist(meta[meta$Image == "Root", "Color"]), unlist(meta[meta$Image == "Root", "Pytorch"]), "pytorch-tip") +
+  render_cluster(fread("RootCrossSection_recolorize.txt"), unlist(meta[meta$Image == "Root", "Color"]), unlist(meta[meta$Image == "Root", "Recolorize"]), "recolorize") +
+  render_cluster(fread("RootCrossSection_supercells.txt"), unlist(meta[meta$Image == "Root", "Color"]), unlist(meta[meta$Image == "Root", "Supercells"]), "supercells") +
+  plot_annotation(tag_levels = "A")
+
 
 
 

@@ -18,6 +18,8 @@ library(patchwork)
 # Set a working directory
 setwd("~/Git_Repos/UnsupervisedSegmentation/Spatial_Differential_Statistics/")
 
+theme_set(theme_bw())
+
 ## Load MSI Data----------------------------------------------------------------
 
 # Read in MSI data
@@ -158,26 +160,38 @@ barplots <- pvals %>%
     scale_fill_manual(values = c("red", "black")) +
     theme_bw() +
     ggtitle("# of Significant Biomolecules") +
-    theme(plot.title = element_text(hjust = 0.5), legend.position = "bottom")
-
-# Make a boxplot of pvalue distributions 
-boxplots <- ggplot(pvals, aes(x = Algorithm, y = PVal, fill = Algorithm)) +
-  geom_boxplot() +
-  ylab("p-value") +
-  theme_bw() +
-  theme(legend.position = "none")
-
-pvals %>%
-  filter(!is.na(PVal) & PVal <= 0.05) %>% 
-  select(Biomolecule, Algorithm) %>%
-  mutate(Presence = "X") %>%
-  pivot_wider(id_cols = Biomolecule, values_from = Presence, names_from = Algorithm)
+    theme(plot.title = element_text(hjust = 0.5), legend.position = "bottom",
+         axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
 
 
+# Order based off of hclust: Manual, pytorch-tip, supercells, recolorize, binning, 
+# clara, Multi-Otsu, KCC, k-means
+model_order <- c("Manual", "pytorch-tip", "supercells", "recolorize", "binning",
+                 "clara", "Multi-Otsu", "KCC", "k-means")
 
-barplots + boxplots
+heatmap <- pvals %>%
+  mutate(PVal = ifelse(is.na(PVal), 1, PVal)) %>%
+  pivot_wider(names_from = Algorithm, values_from = PVal, id_cols = Biomolecule) %>%
+  select(-Biomolecule) %>%
+  cor(method = "spearman") %>%
+  data.table() %>%
+  mutate(Model1 = colnames(.)) %>%
+  relocate(Model1) %>%
+  pivot_longer(-1) %>%
+  rename(Model2 = name, `Spearman Correlation` = value) %>%
+  mutate(
+    Model1 = factor(Model1, levels = rev(model_order)), 
+    Model2 = factor(Model2, levels = rev(model_order))
+  ) %>%
+  ggplot(aes(x = Model1, y = Model2, fill = `Spearman Correlation`)) +
+    geom_tile() +
+    scale_fill_viridis() +
+    theme(legend.position = "bottom",
+          axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
+    xlab("") +
+    ylab("")
 
-
+barplots + heatmap + plot_annotation(tag_levels = "A") 
 
 
 

@@ -316,7 +316,7 @@ apply_supercells(in_path = "~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/KPM
                  out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/")
 
 ################################################################################
-### Root Images-----------------------------------------------------------------
+### Root Image------------------------------------------------------------------
 ################################################################################
 
 root_images <- list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Original/", full.names = T)
@@ -356,4 +356,36 @@ lapply(root_images, function(x) {
     in_path = x, k = 2, blur = FALSE, out_path = "~/Git_Repos/UnsupervisedSegmentation/Images/Root/Supercells_TXT"
   )
 })
+
+################################################################################
+### Segment extra examples------------------------------------------------------
+################################################################################
+
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/clara.R")
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/kcc.R")
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/kmeans.R")
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/recolorize.R")
+source("~/Git_Repos/UnsupervisedSegmentation/Algorithms/supercells.R")
+
+run_additional_example <- function(in_path, k, out_path) {
+  apply_clara(in_path, k, out_path, blur = FALSE)
+  apply_kcc(in_path, k, out_path, blur = FALSE)
+  apply_kmeans(in_path, k, out_path, blur = FALSE)
+  apply_recolorize(in_path, k, out_path, blur = FALSE)
+  apply_supercells(in_path, k, out_path, blur = FALSE)
+}
+
+setwd("~/Git_Repos/UnsupervisedSegmentation/Data_Processing/AdditionalExamples/")
+
+# Leaf
+run_additional_example("Leaf.png", 3, "../../Images/Leaf/")
+
+# Root Cross-Section
+run_additional_example("RootCrossSection.png", 4, "../../Images/RootCrossSection/")
+
+
+
+
+
+
 
