@@ -25,6 +25,7 @@ The goal of this work is to compare open-source unsupervised semantic segmentati
 |Figures/ | -- | Contains figures and tables |
 |Metadata/ | -- | Contains all manual annotations of clusters |
 |Performance/ | -- | Contains code and results from balanced accuracy calculations |
+|Spatial_Differential_Statistics | -- | Houses the mixed-effect ANOVAs and analytical results |
 |Visualization/ | -- | Contains a function to convert the segmentation mask txt files to images in png format |
 
 ### Images
