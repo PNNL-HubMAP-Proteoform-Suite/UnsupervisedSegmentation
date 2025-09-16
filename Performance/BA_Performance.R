@@ -68,8 +68,6 @@ Re <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Blur_Counts/Recolo
 Re_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Blur_Counts/Recolorize_Blur_Counts.csv")
 PT <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Blur_Counts/PyTorch_Counts.csv")
 PT_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Blur_Counts/PyTorch_Blur_Counts.csv")
-PY <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Blur_Counts/PyImSeg_Counts.csv")
-PY_Blur <- fread("~/Git_Repos/UnsupervisedSegmentation/Performance/Blur_Counts/PyImSeg_Blur_Counts.csv")
 
 # Calculate balanced accuracy 
 BA <- rbind(
@@ -84,9 +82,7 @@ BA <- rbind(
   Re %>% mutate(Algorithm = "recolorize", Format = "Original"),
   Re_Blur %>% mutate(Algorithm = "recolorize", Format = "Blur"),
   PT %>% mutate(Algorithm = "pytorch-tip", Format = "Original"),
-  PT_Blur %>% mutate(Algorithm = "pytorch-tip", Format = "Blur"),
-  PY %>% mutate(Algorithm = "pyImSegm", Format = "Original"),
-  PY_Blur %>% mutate(Algorithm = "pyImSegm", Format = "Blur")
+  PT_Blur %>% mutate(Algorithm = "pytorch-tip", Format = "Blur")
 ) %>%
   pivot_wider(id_cols = c(Cluster, Image, Algorithm, Format), names_from = Counts, values_from = Freq) %>%
   mutate(
@@ -133,65 +129,75 @@ DR_Plot + BA_Plot + plot_layout(widths = c(1,2)) + plot_annotation(tag_levels = 
 ## FULL ANALYSIS ##
 ###################
 
+count_files <- append(
+  list.files("~/Git_Repos/UnsupervisedSegmentation/Performance/Full_Counts", full.names = T),
+  list.files("~/Git_Repos/UnsupervisedSegmentation/Performance/Root_Counts", full.names = T)
+)
+
 # Load all files
-all_counts <- do.call(rbind, lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Performance/Full_Counts/", full.names = T), function(file) {
+all_counts <- do.call(rbind, lapply(count_files, function(file) {
   data <- fread(file)
   data$Method <- strsplit(file, "/", fixed = T) %>% unlist() %>% tail(1) %>% gsub(pattern = "_Counts.csv", replacement = "")
   return(data)
 })) %>%
   filter(Method != "KCC_Blur") %>%
-  mutate(Method = ifelse(Method == "Binning.csv", "binning", Method),
-         Method = ifelse(Method == "MultiOtsu.csv", "Multi-Otsu", Method))
+  mutate(
+    Method = tolower(Method),
+    Method = ifelse(Method == "binning.csv", "binning", Method),
+    Method = ifelse(Method == "kcc", "KCC", Method),
+    Method = ifelse(Method == "kmeans", "k-means", Method),
+    Method = ifelse(Method == "multiotsu.csv", "Multi-Otsu", Method),
+    Method = ifelse(Method == "multiotsu", "Multi-Otsu", Method),
+    Method = ifelse(Method == "pytorch", "pytorch-tip", Method)
+  )
 
 # Calculate balanced accuracies  
 Stats_Table <- all_counts %>% 
   pivot_wider(id_cols = c(Cluster, Image, Method), names_from = Counts, values_from = Freq) %>%
   mutate(
     `True Positive` = ifelse(is.na(`True Positive`), 0, `True Positive`),
+    `True Negative` = ifelse(is.na(`True Negative`), 0, `True Negative`),
     `False Positive` = ifelse(is.na(`False Positive`), 0, `False Positive`),
+    `False Negative` = ifelse(is.na(`False Negative`), 0, `False Negative`),
     BA = ((`True Positive` / (`True Positive` + `False Negative`)) + 
             (`True Negative` / (`True Negative` + `False Positive`))) / 2,
-  ) %>% mutate(
-    Method = ifelse(Method == "PyImSeg", "pyImSegm", Method), 
-    Method = ifelse(Method == "PyTorch", "pytorch-tip", Method),
-    Method = ifelse(Method == "Clara", "clara", Method),
-    Method = ifelse(Method == "Recolorize", "recolorize", Method),
-    Method = ifelse(Method == "Supercells", "supercells", Method),
-    Method = ifelse(Method == "KMeans", "K-Means", Method)
-  )
-  
+  ) 
+
 # Make plots--------------------------------------------------------------------
 
 # Check assumptions of ANOVA
 Check <- Stats_Table %>% 
   select(Method, BA) %>%
-  filter(!is.na(BA)) %>%
+  mutate(BA = log(BA)) %>%
   group_by(Method) %>%
   mutate(Residuals = BA - mean(BA))
 plot(qqnorm(Check$Residuals))
 qqline(Check$Residuals) # Normality assumption is ok
 ggplot(Check, aes(x = Method, y = Residuals)) + geom_boxplot() + theme_bw() # Equal variance is ok
 
+Stats_Table2 <- Stats_Table %>%
+  mutate(BA = log(BA))
+  
 # Calculate an ANOVA and get the p-values for the multiple comparison adjustment 
-myanova <- lm(BA~Method, data = Stats_Table)
+myanova <- lm(BA~Method, data = Stats_Table2)
 summary(myanova)
-TukeyHSD(aov(BA~Method, data = Stats_Table))$Method %>%
+TukeyHSD(aov(BA~Method, data = Stats_Table2))$Method %>%
   data.frame() %>%
   arrange(p.adj)
 
-Stats_Table %>%
+mymets <- Stats_Table %>%
   group_by(Method) %>%
   summarise(Mean = mean(BA), SD = sd(BA)) %>%
   arrange(-Mean)
+mymets
 
 # Order plot 
 Overview_Plot <- Stats_Table %>%
-  mutate(Method = factor(Method, levels = c("recolorize", "binning", "K-Means", "pyImSegm",
-                                            "KCC", "supercells", "Multi-Otsu", "clara", "pytorch-tip"))) %>%
+  mutate(Method = factor(Method, levels = c("k-means", "KCC", "supercells", "recolorize",
+                                            "clara", "Multi-Otsu", "binning", "pytorch-tip"))) %>%
     ggplot(aes(x = Method, y = BA)) + 
     geom_boxplot() +
-    geom_signif(comparisons = list(c("recolorize", "pytorch-tip"), c("recolorize", "clara"),
-                                   c("recolorize", "Multi-Otsu")),
+    geom_signif(comparisons = list(c("k-means", "pytorch-tip")),
                 annotations = "*", textsize = 8) +
     theme_bw() +
     theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
@@ -199,7 +205,6 @@ Overview_Plot <- Stats_Table %>%
     theme(legend.position = "none") +
     ylab("Balanced Accuracy") + 
     xlab("")
-
 Overview_Plot
 
 # Make a hierarchical cluster
@@ -253,6 +258,25 @@ SpeedPlot
 (DR_Plot | Overview_Plot | SpeedPlot | HcluPlot) / PerformancePlot + 
   plot_annotation(tag_levels = "A")
 
+## Cluster Statistics
+
+image_clus <- Stats_Table %>% 
+  group_by(Image) %>% 
+  slice_max(Cluster) %>%
+  select(Image, Cluster) %>%
+  unique()
+
+Stats_Table %>%
+  select(Image, BA) %>%
+  group_by(Image) %>%
+  summarize(Mean = mean(BA)) %>%
+  left_join(image_clus) %>%
+  group_by(Cluster) %>%
+  summarize(Mean = mean(Mean))
+
+Stats_Table %>%
+  group_by(Method) %>%
+  summarize(Mean = mean(BA), SD = sd(BA))
 
 
 

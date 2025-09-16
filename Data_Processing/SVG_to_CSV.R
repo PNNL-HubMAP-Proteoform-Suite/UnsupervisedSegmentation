@@ -364,9 +364,44 @@ write.table(format_mask(Mask30), "~/Git_Repos/UnsupervisedSegmentation/Images/Ki
             quote = F, row.names = F, sep = "\t")
 
 
+## ROOT IMAGE-------------------------------------------------------------------
+
+root_tiles <- list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Manual_Segmentation_Masks_SVG", full.names = T)
+
+root_feature <- data.frame(
+  symbol = c("Blue", "Blue"),
+  red = c(64, 200),
+  green = c(90, 207),
+  blue = c(230, 248),
+  thresh = c(30, 30)
+)
+
+for (pth in root_tiles) {
+  mask <- SVG_to_CSV(pth, root_feature)
+  img <- make_plot(mask, c("white", "blue"))
+  ggsave(file.path("~/Downloads/test_res", pth %>% strsplit("/") %>% unlist() %>% tail(1) %>% gsub(pattern = ".svg", replacement = ".png", fixed = T)))
+  write.table(format_mask(mask),
+              pth %>% 
+                gsub(pattern = "_SVG", replacement = "_TXT", fixed = T) %>%
+                gsub(pattern = ".svg", replacement =  ".txt", fixed = T),
+              quote = F, row.names = F, sep = "\t")
+}
+
+
+root2_feature <- data.frame(
+  symbol = "White",
+  red = 255,
+  green = 255, 
+  blue = 255,
+  thresh = 60
+)
+out <- SVG_to_CSV("Feature_Modified.png", root2_feature)
+plot <- make_plot(out, c("white", "black"))
 
 
 
+
+write.table(out, "Feature_annotated.txt", quote = F, row.names = F, sep = "\t")
 
 
 

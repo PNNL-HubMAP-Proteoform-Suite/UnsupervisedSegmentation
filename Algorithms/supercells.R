@@ -59,7 +59,7 @@ apply_supercells <- function(in_path, k, out_path, blur) {
   
   # Convert regions to groups
   regions <- data.frame(Regions = unique(coordinates$Regions),
-             Cluster = as.factor(kmeans(data.frame(SCELLS$lyr.1, SCELLS$lyr.2, SCELLS$lyr.3), centers = k)$cluster))
+                        Cluster = as.factor(kmeans(data.frame(SCELLS$lyr.1, SCELLS$lyr.2, SCELLS$lyr.3), centers = k)$cluster))
   regions <- left_join(regions, coordinates)
   
   # Fill a matrix with edges
@@ -92,6 +92,3 @@ apply_supercells <- function(in_path, k, out_path, blur) {
   fwrite(Smaller, file.path(out_path, end_string), quote = F, row.names = F, sep = "\t")
   
 }
-
-
-

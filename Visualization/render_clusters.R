@@ -1,5 +1,6 @@
 library(data.table)
 library(tidyverse)
+library(patchwork)
 
 render_cluster <- function(data, colors, order, title) {
   
@@ -13,11 +14,11 @@ render_cluster <- function(data, colors, order, title) {
     mutate(Width = gsub("V", "", Width) %>% as.numeric(),
            Cluster = as.factor(Cluster)) %>% 
     ggplot(aes(x = Width, y = Height, fill = Cluster)) +
-    geom_raster(interpolate = TRUE) +
-    scale_fill_manual(values = colorList) +
-    theme_void() +
-    ggtitle(title) + 
-    theme(legend.position = "none", plot.title = element_text(hjust = 0.5)) 
+      geom_raster(interpolate = TRUE) +
+      scale_fill_manual(values = colorList) +
+      theme_void() +
+      ggtitle(title) + 
+      theme(legend.position = "none", plot.title = element_text(hjust = 0.5)) 
   
 }
 
@@ -275,43 +276,6 @@ lapply(target, function(subtile) {
 #  
 #})
 
-
-# PyImSeg--------------------------------------------------------------------
-
-Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv") %>%
-  filter(Blur != "X")
-
-lapply(target, function(subtile) {
-  
-  root <- unique(Image_Metadata$Path)[subtile]
-  newroot <- gsub("_Annotations", "", root)
-  data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/pyImSeg_TXT/", paste0(newroot, ".txt")))
-  plot <- render_cluster(data,
-                         unlist(Image_Metadata[Image_Metadata$Path == root, Color]),
-                         unlist(Image_Metadata[Image_Metadata$Path == root, PyImSeg]))
-  plot
-  
-  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/pyImSeg_PNG/", paste0(newroot, ".png")),  plot = plot,
-         units = "px", height = nrow(data), width = ncol(data))
-  
-})
-
-
-#lapply(target, function(subtile) {
-#  
-#  root <- unique(Image_Metadata$Path)[subtile]
-#  newroot <- gsub("_Annotations", "", root)
-#  data <- fread(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/pyImSeg_Blur_TXT/", paste0(newroot, ".txt")))
-#  plot <- render_cluster(data,
-#                         unlist(Image_Metadata[Image_Metadata$Path == root, Color]),
-#                         unlist(Image_Metadata[Image_Metadata$Path == root, PyImSeg.Blur]))
-#  plot
-#  
-#  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/pyImSeg_Blur_PNG/", paste0(newroot, ".png")),  plot = plot,
-#         units = "px", height = nrow(data), width = ncol(data))
-#  
-#})
-
 # MultiOtsu---------------------------------------------------------------------
 
 Image_Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv")
@@ -369,28 +333,25 @@ colorPal <- c("white", "#0072B2", "orange")
 Target <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/KPMP_uS-X002Y010_Annotations.txt"), 
                colorPal, c(1,2,3), "Target")
 Binning <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Binning_TXT/KPMP_uS-X002Y010_binning.txt"), 
-               colorPal, c(2,3,1), "Binning")
+               colorPal, c(2,3,1), "binning")
 Clara <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Clara_TXT/KPMP_uS-X002Y010_clara.txt"), 
-               colorPal, c(2,3,1), "Clara")
+               colorPal, c(2,3,1), "clara")
 KMeans <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMeans_TXT/KPMP_uS-X002Y010_KMeans.txt"),
-               colorPal, c(3,1,2), "K-Means")
+               colorPal, c(3,1,2), "k-means")
 KCC <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KCC_TXT/KPMP_uS-X002Y010_KCC.txt"),
                colorPal, c(2,3,1), "KCC")
 MO <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Multiotsu_TXT/KPMP_uS-X002Y010_multiotsu.txt"),
                colorPal, c(2,3,1), "Multi-Otsu")
-ImSeg <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/pyImSeg_TXT/KPMP_uS-X002Y010.txt"),
-               colorPal, c(2,1,3), "pyImSegm")
 pytorch <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/PyTorch_TXT/KPMP_uS-X002Y010.txt"),
                colorPal, c(3,1,2), "pytorch-tip")
 Recolorize <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Recolorize_TXT/KPMP_uS-X002Y010_recolorize.txt"),
-               colorPal, c(1,2,3), "Recolorize")
+               colorPal, c(1,2,3), "recolorize")
 Supercells <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Supercells_TXT/KPMP_uS-X002Y010_supercells.txt"),
-               colorPal, c(3,1,2), "Supercells")
+               colorPal, c(3,1,2), "supercells")
 
 # Figure 2
-F2 <- Target + Binning + Clara + KMeans + KCC + MO + ImSeg + pytorch + Recolorize + Supercells +
-  plot_layout(nrow = 2, ncol = 5) + plot_annotation(tag_levels = "A")
-
+F2 <- Target + Binning + Clara + KMeans + KCC + MO + pytorch + Recolorize + Supercells +
+  plot_layout(nrow = 3, ncol = 3) + plot_annotation(tag_levels = "A")
 F2
 
 ## Full Tissue ## 
@@ -416,12 +377,177 @@ Clara <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/Clara.png", 
 KCC_Blur <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/KCC_Blur.png", "KCC with Blur")
 KCC <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/KCC.png", "KCC")
 KMeans <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/KMeans.png", "K-Means")
-PyImSeg <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/PyImSeg.png", "pyImSegm")
 PyTorch <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/PyTorch.png", "pytorch-tip")
 Recolorize <-  draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/Recolorize.png", "recolorize")
 Supercells <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/KPMP/Supercells.png", "supercells")
 
-F4 <- Ori + Clara + KCC_Blur + KCC + KMeans + PyImSeg + PyTorch + Recolorize + Supercells + plot_annotation(tag_levels = "A")
+F4 <- Ori + Clara + KCC_Blur + KCC + KMeans + PyTorch + Recolorize + Supercells + plot_annotation(tag_levels = "A")
 F4
+
+## Root-------------------------------------------------------------------------
+
+root_im <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Root.csv")
+
+## Binning
+lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Binning_TXT", full.names = T), function(x) {
+  title <- x %>% strsplit("/") %>% unlist() %>% tail(1)
+  root <- gsub(pattern = "_binning.txt", replacement = "", title, fixed = T)
+  newroot <- title %>% gsub(pattern = ".txt", replacement = ".png", fixed = T)
+  data <- fread(x)
+  plot <- render_cluster(
+    data,
+    unlist(root_im[root_im$Image == root, "Color"]),
+    unlist(root_im[root_im$Image == root, "Binning"]),
+    "Binning"
+  )
+  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Binning_PNG/", newroot),  plot = plot,
+         units = "px", height = nrow(data), width = ncol(data))
+})
+
+## Clara
+lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Clara_TXT", full.names = T), function(x) {
+  title <- x %>% strsplit("/") %>% unlist() %>% tail(1)
+  root <- gsub(pattern = "_CLARA.txt", replacement = "", title, fixed = T)
+  newroot <- title %>% gsub(pattern = ".txt", replacement = ".png", fixed = T)
+  data <- fread(x)
+  plot <- render_cluster(
+    data,
+    unlist(root_im[root_im$Image == root, "Color"]),
+    unlist(root_im[root_im$Image == root, "Clara"]),
+    "Clara"
+  )
+  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Clara_PNG/", newroot),  plot = plot,
+         units = "px", height = nrow(data), width = ncol(data))
+})
+
+## KCC
+lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/KCC_TXT", full.names = T), function(x) {
+  title <- x %>% strsplit("/") %>% unlist() %>% tail(1)
+  root <- gsub(pattern = "_KCC.txt", replacement = "", title, fixed = T)
+  newroot <- title %>% gsub(pattern = ".txt", replacement = ".png", fixed = T)
+  data <- fread(x)
+  plot <- render_cluster(
+    data,
+    unlist(root_im[root_im$Image == root, "Color"]),
+    unlist(root_im[root_im$Image == root, "KCC"]),
+    "KCC"
+  )
+  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Root/KCC_PNG/", newroot),  plot = plot,
+         units = "px", height = nrow(data), width = ncol(data))
+})
+
+## KMeans
+lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/KMeans_TXT/", full.names = T), function(x) {
+  title <- x %>% strsplit("/") %>% unlist() %>% tail(1)
+  root <- gsub(pattern = "_KMeans.txt", replacement = "", title, fixed = T)
+  newroot <- title %>% gsub(pattern = ".txt", replacement = ".png", fixed = T)
+  data <- fread(x)
+  plot <- render_cluster(
+    data,
+    unlist(root_im[root_im$Image == root, "Color"]),
+    unlist(root_im[root_im$Image == root, "Kmeans"]),
+    "KMeans"
+  )
+  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Root/KMeans_PNG/", newroot),  plot = plot,
+         units = "px", height = nrow(data), width = ncol(data))
+})
+
+## Multi-Otsu
+lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Multiotsu_TXT/", full.names = T), function(x) {
+  title <- x %>% strsplit("/") %>% unlist() %>% tail(1)
+  root <- gsub(pattern = "_multiotsu.txt", replacement = "", title, fixed = T)
+  newroot <- title %>% gsub(pattern = ".txt", replacement = ".png", fixed = T)
+  data <- fread(x)
+  plot <- render_cluster(
+    data,
+    unlist(root_im[root_im$Image == root, "Color"]),
+    unlist(root_im[root_im$Image == root, "Multiotsu"]),
+    "Multi-Otsu"
+  )
+  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Multiotsu_PNG/", newroot),  plot = plot,
+         units = "px", height = nrow(data), width = ncol(data))
+})
+
+## pytorch-tip
+lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/PyTorch_TXT/", full.names = T), function(x) {
+  title <- x %>% strsplit("/") %>% unlist() %>% tail(1)
+  root <- gsub(pattern = ".txt", replacement = "", title, fixed = T)
+  newroot <- title %>% gsub(pattern = ".txt", replacement = ".png", fixed = T)
+  data <- fread(x)
+  plot <- render_cluster(
+    data,
+    unlist(root_im[root_im$Image == root, "Color"]),
+    unlist(root_im[root_im$Image == root, "Pytorch"]),
+    "pytorch-tip"
+  )
+  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Root/PyTorch_PNG/", newroot),  plot = plot,
+         units = "px", height = nrow(data), width = ncol(data))
+})
+
+## Recolorize
+lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Recolorize_TXT/", full.names = T), function(x) {
+  title <- x %>% strsplit("/") %>% unlist() %>% tail(1)
+  root <- gsub(pattern = "_recolorize.txt", replacement = "", title, fixed = T)
+  newroot <- title %>% gsub(pattern = ".txt", replacement = ".png", fixed = T)
+  data <- fread(x)
+  plot <- render_cluster(
+    data,
+    unlist(root_im[root_im$Image == root, "Color"]),
+    unlist(root_im[root_im$Image == root, "Recolorize"]),
+    "Recolorize"
+  )
+  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Recolorize_PNG/", newroot),  plot = plot,
+         units = "px", height = nrow(data), width = ncol(data))
+})
+
+## Supercells
+lapply(list.files("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Supercells_TXT/", full.names = T), function(x) {
+  title <- x %>% strsplit("/") %>% unlist() %>% tail(1)
+  root <- gsub(pattern = "_supercells.txt", replacement = "", title, fixed = T)
+  newroot <- title %>% gsub(pattern = ".txt", replacement = ".png", fixed = T)
+  data <- fread(x)
+  plot <- render_cluster(
+    data,
+    unlist(root_im[root_im$Image == root, "Color"]),
+    unlist(root_im[root_im$Image == root, "Supercells"]),
+    "Supercells"
+  )
+  ggsave(file.path("~/Git_Repos/UnsupervisedSegmentation/Images/Root/Supercells_PNG/", newroot),  plot = plot,
+         units = "px", height = nrow(data), width = ncol(data))
+})
+
+## Additional Images------------------------------------------------------------
+
+# Leaf
+setwd("~/Git_Repos/UnsupervisedSegmentation/Images/Leaf/")
+
+meta <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/AdditionalImages.csv")
+(ggdraw() + draw_image("../../Data_Processing/AdditionalExamples/Leaf.png", width = 1, height = 0.9) + draw_label("Original", y = 0.95, size = 14)) +
+  render_cluster(fread("Leaf_binning.txt"), unlist(meta[meta$Image == "Leaf", "Color"]), unlist(meta[meta$Image == "Leaf", "Binning"]), "binning") + 
+  render_cluster(fread("Leaf_CLARA.txt"), unlist(meta[meta$Image == "Leaf", "Color"]), unlist(meta[meta$Image == "Leaf", "Clara"]), "clara") +
+  render_cluster(fread("Leaf_KCC.txt"), unlist(meta[meta$Image == "Leaf", "Color"]), unlist(meta[meta$Image == "Leaf", "KCC"]), "kcc") +
+  render_cluster(fread("Leaf_KMeans.txt"), unlist(meta[meta$Image == "Leaf", "Color"]), unlist(meta[meta$Image == "Leaf", "Kmeans"]), "k-means") + 
+  render_cluster(fread("Leaf_multiotsu.txt"), unlist(meta[meta$Image == "Leaf", "Color"]), unlist(meta[meta$Image == "Leaf", "MultiOtsu"]), "Multi-Otsu") +
+  render_cluster(fread("Leaf_PyTorch.txt"), unlist(meta[meta$Image == "Leaf", "Color"]), unlist(meta[meta$Image == "Leaf", "Pytorch"]), "pytorch-tip") +
+  render_cluster(fread("Leaf_recolorize.txt"), unlist(meta[meta$Image == "Leaf", "Color"]), unlist(meta[meta$Image == "Leaf", "Recolorize"]), "recolorize") +
+  render_cluster(fread("Leaf_supercells.txt"), unlist(meta[meta$Image == "Leaf", "Color"]), unlist(meta[meta$Image == "Leaf", "Supercells"]), "supercells") +
+  plot_annotation(tag_levels = "A")
+
+# Root
+setwd("~/Git_Repos/UnsupervisedSegmentation/Images/RootCrossSection/")
+
+meta <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/AdditionalImages.csv")
+(ggdraw() + draw_image("../../Data_Processing/AdditionalExamples/RootCrossSection.png", width = 1, height = 0.9) + draw_label("Original", y = 0.95, size = 14)) +
+  render_cluster(fread("RootCrossSection_binning.txt"), unlist(meta[meta$Image == "Root", "Color"]), unlist(meta[meta$Image == "Root", "Binning"]), "binning") + 
+  render_cluster(fread("RootCrossSection_CLARA.txt"), unlist(meta[meta$Image == "Root", "Color"]), unlist(meta[meta$Image == "Root", "Clara"]), "clara") +
+  render_cluster(fread("RootCrossSection_KCC.txt"), unlist(meta[meta$Image == "Root", "Color"]), unlist(meta[meta$Image == "Root", "KCC"]), "kcc") +
+  render_cluster(fread("RootCrossSection_KMeans.txt"), unlist(meta[meta$Image == "Root", "Color"]), unlist(meta[meta$Image == "Root", "Kmeans"]), "k-means") + 
+  render_cluster(fread("RootCrossSection_multiotsu.txt"), unlist(meta[meta$Image == "Root", "Color"]), unlist(meta[meta$Image == "Root", "MultiOtsu"]), "Multi-Otsu") +
+  render_cluster(fread("RootCrossSection_PyTorch.txt"), unlist(meta[meta$Image == "Root", "Color"]), unlist(meta[meta$Image == "Root", "Pytorch"]), "pytorch-tip") +
+  render_cluster(fread("RootCrossSection_recolorize.txt"), unlist(meta[meta$Image == "Root", "Color"]), unlist(meta[meta$Image == "Root", "Recolorize"]), "recolorize") +
+  render_cluster(fread("RootCrossSection_supercells.txt"), unlist(meta[meta$Image == "Root", "Color"]), unlist(meta[meta$Image == "Root", "Supercells"]), "supercells") +
+  plot_annotation(tag_levels = "A")
+
+
 
 
