@@ -169,18 +169,6 @@ Re_Blur_Counts <- calc_wrapper(c(3:5, 10, 12, 14, 16, 20, 22, 27), "Kidney_Tiles
                                    "_recolorize.txt", "Recolorize.Blur")
 fwrite(Re_Blur_Counts, "~/Git_Repos/UnsupervisedSegmentation/Performance/Blur_Counts/Recolorize_Blur_Counts.csv", quote = F, row.names = F)
 
-# PyImSeg-----------------------------------------------------------------------
-
-# Non-Blurred
-PyImSeg_Counts <- calc_wrapper(c(3:5, 10, 12, 14, 16, 20, 22, 27), "Kidney_Tiles/pyImSeg_TXT", 
-                        ".txt", "PyImSeg")
-fwrite(PyImSeg_Counts, "~/Git_Repos/UnsupervisedSegmentation/Performance/Blur_Counts/PyImSeg_Counts.csv", quote = F, row.names = F)
-
-# Blurred
-PyImSeg_Blur_Counts <- calc_wrapper(c(3:5, 10, 12, 14, 16, 20, 22, 27), "Kidney_Tiles/pyImSeg_Blur_TXT", 
-                               ".txt", "PyImSeg.Blur")
-fwrite(PyImSeg_Blur_Counts, "~/Git_Repos/UnsupervisedSegmentation/Performance/Blur_Counts/PyImSeg_Blur_Counts.csv", quote = F, row.names = F)
-
 # PyTorch-----------------------------------------------------------------------
 
 # Non-Blurred
@@ -216,10 +204,6 @@ fwrite(Supercells, "~/Git_Repos/UnsupervisedSegmentation/Performance/Full_Counts
 # Recolorize-------------------------------------------------------------------
 Recolorize <- calc_wrapper(1:30, "Kidney_Tiles/Recolorize_TXT", "_recolorize.txt", "Recolorize")
 fwrite(Recolorize, "~/Git_Repos/UnsupervisedSegmentation/Performance/Full_Counts/Recolorize_Counts.csv", quote = F, row.names = F)
-
-# PyImSeg-----------------------------------------------------------------------
-PyImSeg <- calc_wrapper(1:30, "Kidney_Tiles/pyImSeg_TXT", ".txt", "PyImSeg")
-fwrite(PyImSeg, "~/Git_Repos/UnsupervisedSegmentation/Performance/Full_Counts/PyImSeg_Counts.csv", quote = F, row.names = F)
 
 # PyTorch-----------------------------------------------------------------------
 PyTorch <- calc_wrapper(1:30, "Kidney_Tiles/PyTorch_TXT", ".txt", "PyTorch")
