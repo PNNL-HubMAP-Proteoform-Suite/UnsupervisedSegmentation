@@ -95,10 +95,13 @@ edata <- edata %>%
 
 ## Run Spatial ANOVAs-----------------------------------------------------------
 
+library(mgcv)
+
 calc_pvalue_truth <- function(x) {
   pval <- tryCatch({
-    aov_model <- lmer(Abundance ~ Class + (1|X + Y), data = x)
-    pval <- summary(aov_model)$coefficients[2,"Pr(>|t|)"]
+    aov_model <- mgcv::gam(Abundance ~ Class + s(X,Y), data = x)
+    #aov_model <- lme4::lmer(Abundance ~ Class + (1|X + Y), data = x)
+    pval <- summary(aov_model)$p.pv[2] # summary(aov_model)$coefficients[2,"Pr(>|t|)"]
   }, error = function(e) {
     return(NA)
   }
@@ -114,11 +117,11 @@ edata %>%
   nest() %>%
   mutate(PVal = map_dbl(data, calc_pvalue_truth)) %>%
   select(-data) %>%
-  fwrite("pvalues.csv", quote = F, row.names = F)
+  fwrite("pvalues_gam.csv", quote = F, row.names = F)
 
 ## Visualize differences in pvalues---------------------------------------------
 
-pvals <- fread("pvalues.csv") %>%
+pvals <- fread("pvalues_gam.csv") %>%
   mutate(
     Algorithm = tolower(Algorithm),
     Algorithm = ifelse(Algorithm == "truth", "Manual", Algorithm),
@@ -159,7 +162,7 @@ barplots <- pvals %>%
               size = 4) + 
     scale_fill_manual(values = c("red", "black")) +
     theme_bw() +
-    ggtitle("# of Significant Biomolecules") +
+    ggtitle("Using mgcv, # of Significant Biomolecules") +
     theme(plot.title = element_text(hjust = 0.5), legend.position = "bottom",
          axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
 
