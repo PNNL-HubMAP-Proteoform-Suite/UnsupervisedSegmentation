@@ -162,7 +162,7 @@ barplots <- pvals %>%
               size = 4) + 
     scale_fill_manual(values = c("red", "black")) +
     theme_bw() +
-    ggtitle("Using mgcv, # of Significant Biomolecules") +
+    ggtitle("# of Significant Biomolecules") +
     theme(plot.title = element_text(hjust = 0.5), legend.position = "bottom",
          axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
 
