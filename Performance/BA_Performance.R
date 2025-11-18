@@ -224,28 +224,33 @@ PerformancePlot <- rbind(
   left_join(
     Stats_Table %>% filter(Cluster == 1) %>% select(Image, Method, BA),
     Stats_Table %>% group_by(Image, Method) %>% summarize(`Number of Clusters` = n())
-  ) %>% mutate(Type = "Background Cluster"),
+  ),
   left_join(
     Stats_Table %>% filter(Cluster != 1) %>% select(Image, Method, BA),
     Stats_Table %>% group_by(Image, Method) %>% summarize(`Number of Clusters` = n())
-  ) %>% mutate(Type = "Feature Clusters")
+  ) 
 ) %>%
-  mutate(`Number of Clusters` = as.factor(`Number of Clusters`)) %>%
-  ggplot(aes(x = `Number of Clusters`, y = BA, fill = `Number of Clusters`)) +
+  mutate(
+    Random = 1 / `Number of Clusters`,
+    `Number of Clusters` = as.factor(paste("Number of Clusters:", `Number of Clusters`)),
+  ) %>%
+  rename(Model = Method) %>%
+  ggplot(aes(x = Model, y = BA, fill = Model)) +
     geom_boxplot() +
+    geom_hline(aes(yintercept = Random), color = "red") + 
     theme_bw() +
-    ylim(c(0, 1)) +
-    theme(legend.position = "none") +
-    facet_grid(cols = vars(Method), rows = vars(Type)) + 
+    theme(axis.text.x = element_blank(), axis.ticks.x = element_blank()) +
+    facet_wrap(.~`Number of Clusters`, nrow = 1) + 
+    xlab("") +
     ylab("Balanced Accuracy") 
 
 PerformancePlot
 
 # Average time 
-algOrder <- c("binning", "Multi-Otsu", "clara", "K-Means", "recolorize", "pyImSegm", "pytorch-tip", "supercells", "KCC")
+algOrder <- c("binning", "Multi-Otsu", "clara", "K-Means", "recolorize", "pytorch-tip", "supercells", "KCC")
 SpeedPlot <- data.table(
   Algorithm = factor(algOrder, levels = algOrder),
-  `Average Time (seconds)` = c(1.95, 2.5, 4.5, 5.8, 15.3, 15.8, 20.2, 29.5, 92.3)
+  `Average Time (seconds)` = c(1.95, 2.5, 4.5, 5.8, 15.3, 20.2, 29.5, 92.3)
 ) %>%
   ggplot(aes(x = Algorithm, y = `Average Time (seconds)`)) +
     geom_bar(stat = "identity", color = "black", fill = "steelblue") +

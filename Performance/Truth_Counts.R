@@ -3,9 +3,9 @@ library(tidyverse)
 library(data.table)
 
 ## Load the correct metadata file
-#Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv")
+Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv")
 #Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Dimension_Reduction.csv")
-Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Root.csv")
+#Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Root.csv")
 
 #' @param truth A data.frame with cluster values per height (rows) and width (columns) 
 #'     for the truth data 
@@ -28,20 +28,33 @@ truth_counts <- function(truth, predicted, image, model, rm_row_col = FALSE) {
   make_pivot <- function(df, rm_step = FALSE) {
     
     if (rm_step) {
-      df <- df[2:nrow(df), 2:ncol(df)]
+      
+      df[2:nrow(df), 2:ncol(df)] %>%
+        mutate(Height = 1:nrow(.)) %>%
+        pivot_longer(cols = -Height) %>%
+        rename(Width = name, Cluster = value) %>%
+        mutate(Width = gsub("V", "", Width) %>% as.numeric(),
+               Width = Width - 1,
+               Width = as.integer(Width))
+    
+    } else {
+      
+      df %>%
+        mutate(Height = 1:nrow(.)) %>%
+        pivot_longer(cols = -Height) %>%
+        rename(Width = name, Cluster = value) %>%
+        mutate(Width = gsub("V", "", Width) %>% as.numeric(),
+               Width = as.integer(Width))
+    
     }
     
-    df %>%
-      mutate(Height = 1:nrow(.)) %>%
-      pivot_longer(cols = 1:(ncol(.)-1)) %>%
-      rename(Width = name, Cluster = value) %>%
-      mutate(Width = gsub("V", "", Width) %>% as.numeric())
+
   }
   
   # Merge data.frames for counts 
   toCalc <- left_join(
     make_pivot(truth) %>% rename(TrueCluster = Cluster),
-    make_pivot(predicted, rm_row_col) %>% mutate(Cluster = map_int(Cluster, function(x) {ClusterConvert[[x]]})) %>% rename(PredictedCluster = Cluster),
+    make_pivot(predicted, rm_row_col) %>% mutate(Cluster = map_int(Cluster, function(x) {which(ClusterConvert == x)})) %>% rename(PredictedCluster = Cluster),
     by = c("Height", "Width")
   )
   
@@ -186,11 +199,11 @@ fwrite(PyTorch_Blur_Counts, "~/Git_Repos/UnsupervisedSegmentation/Performance/Bl
 ################
 
 # K-Means-----------------------------------------------------------------------
-KMeans <- calc_wrapper(1:30, "Kidney_Tiles/KMeans_TXT", "_KMeans.txt", "Kmeans")
+KMeans <- calc_wrapper(1:30, "Kidney_Tiles/KMeans_TXT", "_KMeans.txt", "Kmeans") # No image number
 fwrite(KMeans, "~/Git_Repos/UnsupervisedSegmentation/Performance/Full_Counts/KMeans_Counts.csv", quote = F, row.names = F)
 
 # KCC---------------------------------------------------------------------------
-KCC <- calc_wrapper(1:30, "Kidney_Tiles/KCC_TXT", "_KCC.txt", "KCC")
+KCC <- calc_wrapper(1:30, "Kidney_Tiles/KCC_TXT", "_KCC.txt", "KCC") # 
 fwrite(KCC, "~/Git_Repos/UnsupervisedSegmentation/Performance/Full_Counts/KCC_Counts.csv", quote = F, row.names = F)
 
 # Clara-------------------------------------------------------------------------
