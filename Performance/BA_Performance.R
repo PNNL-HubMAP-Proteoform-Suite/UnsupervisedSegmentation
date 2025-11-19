@@ -100,7 +100,6 @@ BA_Plot <- BA %>% select(Cluster, Algorithm, Format, BA) %>%
          Cluster = as.factor(Cluster)) %>%
   ggplot(aes(x = Algorithm, y = BA, fill = Format)) +
     geom_boxplot() + 
-    geom_signif(xmin = 2.8, xmax = 3.2, y_position = 1.01, annotation = "***") +
     theme_bw() +
     ylim(c(0,1.05)) + 
     ylab("Balanced Accuracy") +
@@ -193,8 +192,9 @@ mymets
 
 # Order plot 
 Overview_Plot <- Stats_Table %>%
-  mutate(Method = factor(Method, levels = c("k-means", "KCC", "supercells", "recolorize",
-                                            "clara", "Multi-Otsu", "binning", "pytorch-tip"))) %>%
+  mutate(Method = factor(Method, levels = c("clara", "supercells", "KCC", "k-means",
+                                            "Multi-Otsu", "pytorch-tip", "binning", 
+                                            "recolorize"))) %>%
     ggplot(aes(x = Method, y = BA)) + 
     geom_boxplot() +
     geom_signif(comparisons = list(c("k-means", "pytorch-tip")),

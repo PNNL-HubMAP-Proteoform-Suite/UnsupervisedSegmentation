@@ -3,9 +3,9 @@ library(tidyverse)
 library(data.table)
 
 ## Load the correct metadata file
-Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv")
+#Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Kidney_Annotations_Summary.csv")
 #Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Dimension_Reduction.csv")
-#Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Root.csv")
+Metadata <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/Root.csv")
 
 #' @param truth A data.frame with cluster values per height (rows) and width (columns) 
 #'     for the truth data 
@@ -111,6 +111,8 @@ calc_wrapper <- function(image_num, subfolder, tag, column_name, rm_row_col = FA
 ## DIMENSION REDUCTION ##
 #########################
 
+KCC <- calc_wrapper(1:10, "Kidney_Tiles/KCC_TXT", "_KCC.txt", "KCC")
+fwrite(KCC, "~/Git_Repos/UnsupervisedSegmentation/Performance/DR_Counts/KCC_Counts.csv")
 PCA_KCC <- calc_wrapper(1:10, "Kidney_Tiles/PCA_KCC_TXT", "_PCA_KCC.txt", "KCC.PCA")
 fwrite(PCA_KCC, "~/Git_Repos/UnsupervisedSegmentation/Performance/DR_Counts/PCA_KCC_Counts.csv")
 tSNE_KCC <- calc_wrapper(1:10, "Kidney_Tiles/tSNE_KCC_TXT", "_tSNE_KCC.txt", "KCC.tSNE")
@@ -186,7 +188,7 @@ fwrite(Re_Blur_Counts, "~/Git_Repos/UnsupervisedSegmentation/Performance/Blur_Co
 
 # Non-Blurred
 PyTorch_Counts <- calc_wrapper(c(3:5, 10, 12, 14, 16, 20, 22, 27), "Kidney_Tiles/PyTorch_TXT", 
-                               ".txt", "PyTorch")
+                               ".txt", "PyTorch", rm_row_col = TRUE)
 fwrite(PyTorch_Counts, "~/Git_Repos/UnsupervisedSegmentation/Performance/Blur_Counts/PyTorch_Counts.csv", quote = F, row.names = F)
 
 # Blurred
@@ -266,15 +268,15 @@ Binning <- calc_wrapper_root(1:25, "Root/Binning_TXT", "_binning.txt", "Binning"
 fwrite(Binning, "~/Git_Repos/UnsupervisedSegmentation/Performance/Root_Counts/Binning_Counts.csv", quote = F, row.names = F)
 
 # Clara-------------------------------------------------------------------------
-Clara <- calc_wrapper_root(1:25, "Root/Clara_TXT", "_CLARA.txt", "Clara", TRUE)
+Clara <- calc_wrapper_root(1:25, "Root/Clara_TXT", "_CLARA.txt", "Clara", FALSE)
 fwrite(Clara, "~/Git_Repos/UnsupervisedSegmentation/Performance/Root_Counts/Clara_Counts.csv", quote = F, row.names = F)
 
 # KCC---------------------------------------------------------------------------
-KCC <- calc_wrapper_root(1:25, "Root/KCC_TXT", "_KCC.txt", "KCC", TRUE)
+KCC <- calc_wrapper_root(1:25, "Root/KCC_TXT", "_KCC.txt", "KCC", FALSE)
 fwrite(KCC, "~/Git_Repos/UnsupervisedSegmentation/Performance/Root_Counts/KCC_Counts.csv", quote = F, row.names = F)
 
 # KMeans------------------------------------------------------------------------
-KMeans <- calc_wrapper_root(1:25, "Root/KMeans_TXT", "_KMeans.txt", "Kmeans", TRUE)
+KMeans <- calc_wrapper_root(1:25, "Root/KMeans_TXT", "_KMeans.txt", "Kmeans", FALSE)
 fwrite(KMeans, "~/Git_Repos/UnsupervisedSegmentation/Performance/Root_Counts/KMeans_Counts.csv", quote = F, row.names = F)
 
 # Multi-Otsu--------------------------------------------------------------------
@@ -282,15 +284,15 @@ MultiOtsu <- calc_wrapper_root(1:25, "Root/Multiotsu_TXT", "_multiotsu.txt", "Mu
 fwrite(MultiOtsu, "~/Git_Repos/UnsupervisedSegmentation/Performance/Root_Counts/MultiOtsu_Counts.csv", quote = F, row.names = F)
 
 # pytorch-tip-------------------------------------------------------------------
-Pytorch <- calc_wrapper_root(1:25, "Root/PyTorch_TXT", ".txt", "Pytorch", TRUE)
+Pytorch <- calc_wrapper_root(1:25, "Root/PyTorch_TXT", ".txt", "Pytorch", FALSE)
 fwrite(Pytorch, "~/Git_Repos/UnsupervisedSegmentation/Performance/Root_Counts/PyTorch_Counts.csv", quote = F, row.names = F)
 
 # Recolorize--------------------------------------------------------------------
-Recolorize <- calc_wrapper_root(1:25, "Root/Recolorize_TXT", "_recolorize.txt", "Recolorize", TRUE)
+Recolorize <- calc_wrapper_root(1:25, "Root/Recolorize_TXT", "_recolorize.txt", "Recolorize", FALSE)
 fwrite(Recolorize, "~/Git_Repos/UnsupervisedSegmentation/Performance/Root_Counts/Recolorize_Counts.csv", quote = F, row.names = F)
 
 # Supercells--------------------------------------------------------------------
-Supercells <- calc_wrapper_root(1:25, "Root/Supercells_TXT", "_supercells.txt", "Supercells", TRUE)
+Supercells <- calc_wrapper_root(1:25, "Root/Supercells_TXT", "_supercells.txt", "Supercells", FALSE)
 fwrite(Supercells, "~/Git_Repos/UnsupervisedSegmentation/Performance/Root_Counts/Supercells_Counts.csv", quote = F, row.names = F)
 
 
