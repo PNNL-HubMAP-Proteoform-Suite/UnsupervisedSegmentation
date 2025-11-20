@@ -7,7 +7,7 @@ render_cluster <- function(data, colors, order, title) {
   colorList <- colors
   names(colorList) <- order
   
-  data[1:5, 1:5] %>%
+  data %>%
     mutate(Height = 1:nrow(.)) %>%
     pivot_longer(cols = c(1:(ncol(.) - 1))) %>%
     rename(Cluster = value, Width = name) %>%
@@ -327,30 +327,30 @@ draw_fun <- function(x, y, height = 0.95, size = 16) {ggdraw(clip = "on") + draw
 Ori <- draw_fun("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Original/KPMP_uS-X002Y007.png", "Original Image", 0.98, 12)
 
 # Set colors
-colorPal <- c("#35B778", "#FDE724", "#205B96", "#440154")
+colorPal <- c("#35B778", "#FDE724", "#40478F", "#440154")
 
 # Make target plot and others
 Target <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/KPMP_uS-X002Y007_Annotations.txt"), 
                colorPal, c(1,2,3,4), "Target")
 Binning <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Binning_TXT/KPMP_uS-X002Y007_binning.txt"), 
-               colorPal, unlist(Image_Metadata[Image_Metadata$Tile == 8, "Binning"]), "binning")
+               colorPal, unlist(Image_Metadata[Image_Metadata$Tile == 8, "Binning"]), "binning, Mean BA = 0.6782")
 Clara <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Clara_TXT/KPMP_uS-X002Y007_clara.txt"), 
-               colorPal, Image_Metadata[Image_Metadata$Tile == 8, "Clara"] %>% unlist(), "clara")
+               colorPal, Image_Metadata[Image_Metadata$Tile == 8, "Clara"] %>% unlist(), "clara, Mean BA = 0.7196")
 KMeans <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KMeans_TXT/KPMP_uS-X002Y007_KMeans.txt"),
-               colorPal, Image_Metadata[Image_Metadata$Tile == 8, "Kmeans"] %>% unlist(), "k-means")
+               colorPal, Image_Metadata[Image_Metadata$Tile == 8, "Kmeans"] %>% unlist(), "k-means, Mean BA = 0.7188")
 KCC <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/KCC_TXT/KPMP_uS-X002Y007_KCC.txt"),
-               colorPal, Image_Metadata[Image_Metadata$Tile == 8, "KCC"] %>% unlist(), "KCC")
+               colorPal, Image_Metadata[Image_Metadata$Tile == 8, "KCC"] %>% unlist(), "KCC, Mean BA = 0.7188")
 MO <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Multiotsu_TXT/KPMP_uS-X002Y007_multiotsu.txt"),
-               colorPal, Image_Metadata[Image_Metadata$Tile == 8, "MultiOtsu"] %>% unlist(), "Multi-Otsu")
+               colorPal, Image_Metadata[Image_Metadata$Tile == 8, "MultiOtsu"] %>% unlist(), "Multi-Otsu, Mean BA = 0.7203")
 pytorch <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/PyTorch_TXT/KPMP_uS-X002Y007.txt"),
-               colorPal, Image_Metadata[Image_Metadata$Tile == 8, "PyTorch"] %>% unlist(), "pytorch-tip")
+               colorPal, Image_Metadata[Image_Metadata$Tile == 8, "PyTorch"] %>% unlist(), "pytorch-tip, Mean BA = 0.6617")
 Recolorize <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Recolorize_TXT/KPMP_uS-X002Y007_recolorize.txt"),
-               colorPal, Image_Metadata[Image_Metadata$Tile == 8, "Recolorize"] %>% unlist(), "recolorize")
+               colorPal, Image_Metadata[Image_Metadata$Tile == 8, "Recolorize"] %>% unlist(), "recolorize, Mean BA = 0.6194")
 Supercells <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Supercells_TXT/KPMP_uS-X002Y007_supercells.txt"),
-               colorPal, Image_Metadata[Image_Metadata$Tile == 8, "Supercells"] %>% unlist(), "supercells")
+               colorPal, Image_Metadata[Image_Metadata$Tile == 8, "Supercells"] %>% unlist(), "supercells, Mean BA = 0.7198")
 
 # Figure 2
-F2 <- Target + Binning + Clara + KMeans + KCC + MO + pytorch + Recolorize + Supercells +
+F2 <- Target + MO + Supercells + Clara + KCC + KMeans + Binning + pytorch + Recolorize +
   plot_layout(nrow = 3, ncol = 3) + plot_annotation(tag_levels = "A")
 F2
 

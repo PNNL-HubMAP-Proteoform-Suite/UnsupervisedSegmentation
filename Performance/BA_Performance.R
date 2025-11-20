@@ -39,8 +39,8 @@ TukeyHSD(aov(BA~Method, data = DR_Table))
 
 
 DR_Plot <- ggplot(DR_Table, aes(x = Method, y = BA)) +
-  geom_boxplot() +
-  theme_bw() +
+  geom_boxplot(outlier.shape = NA) +
+  #geom_jitter(width = 0.1, height = 0, alpha = 0.25) +
   theme_bw() +
   ylim(c(0,1)) + 
   ylab("Balanced Accuracy") +
@@ -99,7 +99,8 @@ BA_Plot <- BA %>% select(Cluster, Algorithm, Format, BA) %>%
   mutate(Format = factor(Format, levels = c("Original", "Blur")),
          Cluster = as.factor(Cluster)) %>%
   ggplot(aes(x = Algorithm, y = BA, fill = Format)) +
-    geom_boxplot() + 
+    geom_boxplot(outlier.shape = NA) +
+    #geom_jitter(alpha = 0.25) +
     theme_bw() +
     ylim(c(0,1.05)) + 
     ylab("Balanced Accuracy") +
@@ -196,9 +197,8 @@ Overview_Plot <- Stats_Table %>%
                                             "Multi-Otsu", "pytorch-tip", "binning", 
                                             "recolorize"))) %>%
     ggplot(aes(x = Method, y = BA)) + 
-    geom_boxplot() +
-    geom_signif(comparisons = list(c("k-means", "pytorch-tip")),
-                annotations = "*", textsize = 8) +
+    geom_boxplot(outlier.shape = NA) +
+    #geom_jitter(width = 0.1, height = 0, alpha = 0.25) +
     theme_bw() +
     theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
     ylim(c(0, 1.1)) +
