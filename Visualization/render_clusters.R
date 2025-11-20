@@ -2,23 +2,28 @@ library(data.table)
 library(tidyverse)
 library(patchwork)
 
-render_cluster <- function(data, colors, order, title) {
+render_cluster <- function(data, colors, order, title, flip = FALSE) {
   
   colorList <- colors
   names(colorList) <- order
   
-  data %>%
+  data = data %>%
     mutate(Height = 1:nrow(.)) %>%
     pivot_longer(cols = c(1:(ncol(.) - 1))) %>%
     rename(Cluster = value, Width = name) %>%
     mutate(Width = gsub("V", "", Width) %>% as.numeric(),
-           Cluster = as.factor(Cluster)) %>% 
-    ggplot(aes(x = Width, y = Height, fill = Cluster)) +
-      geom_raster(interpolate = TRUE) +
-      scale_fill_manual(values = colorList) +
-      theme_void() +
-      ggtitle(title) + 
-      theme(legend.position = "none", plot.title = element_text(hjust = 0.5)) 
+           Cluster = as.factor(Cluster))
+  
+  if (flip) {
+   data = data %>% mutate(Height = Height * -1)
+  }
+  
+  ggplot(data, aes(x = Width, y = Height, fill = Cluster)) +
+    geom_raster(interpolate = TRUE) +
+    scale_fill_manual(values = colorList) +
+    theme_void() +
+    ggtitle(title) + 
+    theme(legend.position = "none", plot.title = element_text(hjust = 0.5)) 
   
 }
 
@@ -547,6 +552,50 @@ meta <- fread("~/Git_Repos/UnsupervisedSegmentation/Metadata/AdditionalImages.cs
   render_cluster(fread("RootCrossSection_recolorize.txt"), unlist(meta[meta$Image == "Root", "Color"]), unlist(meta[meta$Image == "Root", "Recolorize"]), "recolorize") +
   render_cluster(fread("RootCrossSection_supercells.txt"), unlist(meta[meta$Image == "Root", "Color"]), unlist(meta[meta$Image == "Root", "Supercells"]), "supercells") +
   plot_annotation(tag_levels = "A")
+
+## Whole Image------------------------------------------------------------------
+
+scores <- fread("~/Downloads/msi_segementation/segementation_study/BA_visualizations/BA_df_filled_revised.csv")
+
+scores %>% 
+  filter(tile == "X002Y007") %>%
+  group_by(model) %>%
+  summarize(MeanBA = mean(BA)) %>%
+  arrange(-MeanBA)
+
+## Tiles ##
+
+library(patchwork)
+colorPal <- c("#35B778", "#FDE724", "#40478F", "#440154")
+
+# kcc: 0.6570, kmeans: 0.6569, recolorize: 0.6568, Consensus: 0.6133, 
+# multiotsu: 0.6046, supercells: 0.5907, pytt: 0.5833, clara: 0.5763, 
+# binning: 0.5275
+Target <- render_cluster(fread("~/Git_Repos/UnsupervisedSegmentation/Images/Kidney_Tiles/Manual_Segmentation_Masks_TXT/KPMP_uS-X002Y007_Annotations.txt"), 
+                         colorPal, c(1,2,3,4), "Target")
+kcc <- render_cluster(fread("~/Downloads/msi_segementation/segementation_study/out_results/txt/kcc/kcc-X002Y007.txt"),
+               colorPal, c(2, 4, 1, 3), "KCC, Mean BA: 0.6570", TRUE)
+kmeans <- render_cluster(fread("~/Downloads/msi_segementation/segementation_study/out_results/txt/kmeans/kmeans-X002Y007.txt"),
+               colorPal, c(2, 4, 1, 3), "k-means, Mean BA: 0.6569", TRUE)
+recolorize <- render_cluster(fread("~/Downloads/msi_segementation/segementation_study/out_results/txt/recolorize/recolorize-X002Y007.txt"),
+               colorPal, c(2, 4, 1, 3), "recolorize, Mean BA: 0.6568", TRUE)
+multiotsu <- render_cluster(fread("~/Downloads/msi_segementation/segementation_study/out_results/txt/multiotsu/multiotsu-X002Y007.txt"),
+               colorPal, c(2, 4, 1, 3), "Multi-Otsu, Mean BA: 0.6046", TRUE)
+supercells <- render_cluster(fread("~/Downloads/msi_segementation/segementation_study/out_results/txt/supercells/supercells-X002Y007.txt"),
+                            colorPal, c(2, 4, 1, 3), "supercells, Mean BA: 0.5907", TRUE)
+pytt <- render_cluster(fread("~/Downloads/msi_segementation/segementation_study/out_results/txt/pytt/pytt-X002Y007.txt"),
+                            colorPal, c(2, 4, 1, 3), "pytorch-tip, Mean BA: 0.5833", TRUE)
+clara <- render_cluster(fread("~/Downloads/msi_segementation/segementation_study/out_results/txt/clara/clara-X002Y007.txt"),
+                            colorPal, c(2, 4, 1, 3), "clara, Mean BA: 0.5763", TRUE)
+binning <- render_cluster(fread("~/Downloads/msi_segementation/segementation_study/out_results/txt/binning/binning-X002Y007.txt"),
+                          colorPal, c(2, 4, 1, 3), "binning, Mean BA: 0.5275", TRUE)
+consensus <- render_cluster(fread("~/Downloads/msi_segementation/segementation_study/out_results/txt/Consensus/Consensus-X002Y007.txt"),
+                            colorPal, c(2, 4, 1, 3), "consensus, Mean BA: 0.6133", TRUE)
+
+Target + kcc + kmeans + recolorize + multiotsu + supercells + pytt + clara +
+  binning + consensus + plot_layout(nrow = 2)
+
+
 
 
 
