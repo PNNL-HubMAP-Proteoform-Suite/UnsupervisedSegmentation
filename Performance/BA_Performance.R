@@ -283,9 +283,54 @@ Stats_Table %>%
   group_by(Method) %>%
   summarize(Mean = mean(BA), SD = sd(BA))
 
+# Comparison--------------------------------------------------------------------
 
+scores <- fread("~/Downloads/msi_segementation/segementation_study/BA_visualizations/BA_df_filled_revised.csv")
 
+partA = scores %>%
+  filter(model == "Consensus") %>%
+  ggplot(aes(x = "Full", y = BA)) +
+    geom_boxplot() +
+    theme_bw() +
+    ylab("Balanced Accuracy") +
+    xlab("") +
+    ylim(c(0,1)) +
+    theme(axis.text.x = element_text(size = 16, angle = 45, vjust = 1, hjust = 1),
+          strip.text = element_text(size = 14),
+          axis.title.y = element_text(size = 14),
+          axis.text.y = element_text(size = 16)) +
+    facet_wrap(.~model)
 
+partB = rbind(
+  Stats_Table %>%
+    dplyr::select(Image, Method, BA) %>%
+    mutate(Image = gsub(pattern = "KPMP_uS-", replacement = "", Image) %>% gsub(pattern = "_Annotations", replacement = "")) %>%
+    filter(Image %in% scores$tile) %>%
+    mutate(`Image Type` = "Tile") %>%
+    rename(Model = Method),
+  scores %>% 
+    filter(model %in% c("Consensus", "pyimg_segm") == FALSE) %>%
+    mutate(model = ifelse(model == "kcc", "KCC", model),
+           model = ifelse(model == "kmeans", "k-means", model),
+           model = ifelse(model == "multiotsu", "Multi-Otsu", model),
+           model = ifelse(model == "pytt", "pytorch-tip", model)) %>%
+    dplyr::select(tile, model, BA) %>%
+    rename(Image = tile, Model = model) %>%
+    mutate(`Image Type` = "Full")
+) %>%
+  ggplot(aes(x = `Image Type`, y = BA)) +
+    geom_boxplot() +
+    theme_bw() +
+    ylab("") +
+    ylim(c(0,1)) +
+    theme(axis.text.x = element_text(size = 16, angle = 45, vjust = 1, hjust = 1),
+          axis.title.x = element_text(size = 16),
+          strip.text = element_text(size = 14),
+          axis.text.y = element_blank(),
+          axis.ticks.y = element_blank()) +
+    facet_wrap(.~Model, nrow = 1)
+
+partA + partB + plot_layout(widths = c(1, 16)) + plot_annotation(tag_levels = "A")
 
 
 
